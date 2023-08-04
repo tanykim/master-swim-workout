@@ -1,13 +1,19 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@import "../node_modules/open-color/open-color.css";
+@import url("https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;600;700&family=Karla:wght@400;600;700&display=swap");
+
+:root {
+  --body: "Karla", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+    "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue";
+  --code: "Inconsolata", monospace;
+  --font-xsmall: 10px;
+  --font-small: 14px;
+  --font-normal: 16px;
+  --font-large: 20px;
+  --font-xlarge: 28px;
+  letter-spacing: 0.04em;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+body {
+  margin: 0;
+  font-family: var(--body);
 }

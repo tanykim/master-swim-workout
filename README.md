@@ -1,9 +1,10 @@
-# Getting Started with Create React App
+# Master swim workout
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This is a workout planner for master swim teams.
 
 ## Available Scripts
 
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 In the project directory, you can run:
 
 ### `yarn start`
