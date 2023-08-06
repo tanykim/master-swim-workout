@@ -9,17 +9,17 @@ import {
   Tr,
 } from "@chakra-ui/react";
 import { INTERVAL_BASE, LANE_NAMES } from "./utils/const";
-import { getTimeFromSec } from "./utils/converter";
+import { getTimeFromInterval } from "./utils/converter";
 import { NumberFormat } from "./Intervals";
 
 interface Props {
-  multiplyBy: number;
+  length: number;
   format: NumberFormat;
 }
 
 const OFFSETS = [5, 10, 15, 20];
 
-export default function IntervalsTable({ multiplyBy, format }: Props) {
+export default function IntervalsTable({ length, format }: Props) {
   return (
     <TableContainer>
       <Table variant="striped" colorScheme="blue">
@@ -47,22 +47,22 @@ export default function IntervalsTable({ multiplyBy, format }: Props) {
                   .reverse()
                   .map((offset, j) => (
                     <Td key={j} color={tdColor}>
-                      {getTimeFromSec(
+                      {getTimeFromInterval(
                         INTERVAL_BASE[i],
-                        multiplyBy,
+                        length,
                         format,
                         offset * -1
                       )}
                     </Td>
                   ))}
                 <Td fontWeight={700} color={tdColor}>
-                  {getTimeFromSec(INTERVAL_BASE[i], multiplyBy, format)}
+                  {getTimeFromInterval(INTERVAL_BASE[i], length, format)}
                 </Td>
                 {OFFSETS.map((offset, j) => (
                   <Td key={j} color={tdColor}>
-                    {getTimeFromSec(
+                    {getTimeFromInterval(
                       INTERVAL_BASE[i],
-                      multiplyBy,
+                      length,
                       format,
                       offset
                     )}

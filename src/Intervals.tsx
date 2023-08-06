@@ -64,7 +64,7 @@ export default function Intervals() {
             </h3>
             <AccordionPanel p={0} pb={4}>
               <IntervalsTable
-                multiplyBy={len.value / BASE_LENGTH}
+                length={len.value}
                 format={intervalFormat as NumberFormat}
               />
             </AccordionPanel>

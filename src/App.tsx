@@ -12,6 +12,7 @@ import {
 } from "@chakra-ui/react";
 import Intervals from "./Intervals";
 import { tabsTheme, accordionTheme } from "./styles/theme";
+import Planner from "./Planner";
 
 const FONT_FAMILY =
   '"Karla", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto","Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue"';
@@ -54,20 +55,20 @@ function App() {
   return (
     <ChakraProvider theme={theme}>
       <Box padding={4}>
-        <Heading as="h1" mb={4}>
+        <Heading as="h1" mb={4} size="lg">
           Master swim workout
         </Heading>
-        <Tabs variant="enclosed" width="4xl">
+        <Tabs variant="enclosed" width="4xl" size="sm">
           <TabList>
-            <Tab as="h2">Intervals</Tab>
             <Tab as="h2">Planner</Tab>
+            <Tab as="h2">Intervals</Tab>
           </TabList>
           <TabPanels>
-            <TabPanel p={0}>
-              <Intervals />
+            <TabPanel pt={6} pb={4}>
+              <Planner />
             </TabPanel>
             <TabPanel>
-              <p>workout planner</p>
+              <Intervals />
             </TabPanel>
           </TabPanels>
         </Tabs>

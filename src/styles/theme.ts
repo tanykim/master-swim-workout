@@ -19,6 +19,9 @@ const tabsBaseStyle = defineTabsStyle({
       cursor: "pointer",
     },
   },
+  tabpanel: {
+    padding: 0,
+  },
 });
 
 const accordionBaseStyle = defineAccordionStyle({
