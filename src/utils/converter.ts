@@ -8,10 +8,13 @@ import {
 } from "./types";
 
 export function getHumanReadableFromSeconds(seconds: number): string {
-  const min = Math.floor(seconds / 60);
+  const hour = Math.floor(seconds / 3600);
+  const min = Math.floor((seconds - hour * 60 * 60) / 60);
   const sec = seconds % 60;
 
-  return `${min}:${sec < 10 ? `0${sec}` : sec}`;
+  return `${hour > 0 ? `${hour}:` : ""}${
+    hour > 0 && min < 10 ? "0" : ""
+  }${min}:${sec < 10 ? `0${sec}` : sec}`;
 }
 
 export function getTotalSecondsFromInterval(
@@ -57,12 +60,17 @@ export function getTotalSecondsFromIntervalPerDistanceWorkout(
   base: number,
   workout: SingleDistanceWorkout
 ) {
-  const { repeats, length, intervalOffset, restSeconds } = workout;
+  const { repeats, alt, length, intervalOffset, restSeconds } = workout;
+
+  // Check slow lane alternative;
+  const totalLen =
+    base >= 120 && alt != null ? alt.repeats * alt.length : repeats * length;
   return getTotalSecondsFromInterval(
     base,
-    repeats * length,
+    totalLen,
     "ceiling",
-    repeats * (restSeconds ?? intervalOffset ?? REPEAT_BREAK_SEC)
+    repeats *
+      (alt?.restSeconds ?? restSeconds ?? intervalOffset ?? REPEAT_BREAK_SEC)
   );
 }
 

@@ -10,7 +10,7 @@ export interface SingleDistanceWorkout extends SingleWorkout {
   rest: TimingType | null;
   intervalOffset?: number;
   restSeconds?: number;
-  alt?: SingleDistanceWorkout;
+  alt?: SingleDistanceWorkout | null;
 }
 
 export interface SingleTimedWorkout extends SingleWorkout {

@@ -58,7 +58,7 @@ function App() {
         <Heading as="h1" mb={4} size="lg">
           Master swim workout
         </Heading>
-        <Tabs variant="enclosed" width="4xl" size="sm">
+        <Tabs variant="enclosed" size="sm">
           <TabList>
             <Tab as="h2">Planner</Tab>
             <Tab as="h2">Intervals</Tab>
@@ -67,7 +67,7 @@ function App() {
             <TabPanel pt={6} pb={4}>
               <Planner />
             </TabPanel>
-            <TabPanel>
+            <TabPanel width="4xl">
               <Intervals />
             </TabPanel>
           </TabPanels>

@@ -5,6 +5,7 @@ import {
   IconButton,
   Input,
   Text,
+  Tooltip,
   VStack,
 } from "@chakra-ui/react";
 import {
@@ -12,7 +13,7 @@ import {
   MdArrowDownward,
   MdArrowUpward,
   MdDelete,
-  MdPlaylistAdd,
+  MdSubdirectoryArrowRight,
 } from "react-icons/md";
 import DistanceWorkout from "./DistanceWorkout";
 import {
@@ -97,7 +98,7 @@ export default function WorkoutGroup({
   // When each workout is updated, update the workoutList
   const updateWorkout = (idx: number, key: string, value: number | string) => {
     const prevList = [...workoutList];
-    prevList[idx] = { ...prevList[idx], [key]: value };
+    prevList[idx] = { ...prevList[idx], [key]: value, alt: null };
     setWorkoutList(prevList);
   };
 
@@ -118,8 +119,6 @@ export default function WorkoutGroup({
       ...selected,
       alt: { ...selected.alt, [key]: value },
     } as SingleDistanceWorkout);
-
-    prevList[idx] = { ...prevList[idx], [key]: value };
     setWorkoutList(prevList);
   };
   const removeSlowLane = (idx: number) => {
@@ -133,7 +132,7 @@ export default function WorkoutGroup({
   };
 
   // Calculate total length and elapsed time per group
-  const totalLength = getTotalLapsPerGroup(workoutList);
+  const totalLength = getTotalLapsPerGroup(workoutList) * rounds;
 
   return (
     <Box>
@@ -160,7 +159,7 @@ export default function WorkoutGroup({
       {workoutList.length > 0 && (
         <VStack align="left" gap={6} mb={6}>
           {workoutList.map((workout, i) => (
-            <HStack key={i} align="flex-start">
+            <HStack key={i} align="flex-start" wrap="wrap">
               {Object.keys(workout).includes("repeats") ? (
                 <DistanceWorkout
                   index={i}
@@ -197,30 +196,37 @@ export default function WorkoutGroup({
                   moveWorkoutUp(i);
                 }}
               />
-              <IconButton
-                ml={4}
+              <Tooltip
+                label="Add a variable for slower lanes"
                 aria-label="Alternative for slow lanes"
-                icon={<MdPlaylistAdd />}
-                size="sm"
-                variant="outline"
-                onClick={() => {
-                  addSlowLaneWorkout(i);
-                }}
-              />
-              <IconButton
-                aria-label="Delete workout"
-                icon={<MdDelete />}
-                size="sm"
-                variant="outline"
-                onClick={() => {
-                  removeWorkout(i);
-                }}
-              />
+              >
+                <IconButton
+                  ml={4}
+                  aria-label="Alternative for slow lanes"
+                  icon={<MdSubdirectoryArrowRight />}
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    addSlowLaneWorkout(i);
+                  }}
+                />
+              </Tooltip>
+              <Tooltip label="Delete this workout" aria-label="delete workout">
+                <IconButton
+                  aria-label="Delete this workout"
+                  icon={<MdDelete />}
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    removeWorkout(i);
+                  }}
+                />
+              </Tooltip>
             </HStack>
           ))}
         </VStack>
       )}
-      <HStack justify="space-between">
+      <HStack justify="space-between" wrap="wrap">
         <HStack spacing={4} direction="row" align="center">
           <Button
             size="sm"

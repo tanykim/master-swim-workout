@@ -19,18 +19,21 @@ interface Props {
 }
 
 export default function ElapsedTimeTable({ workoutGroups }: Props) {
-  const elapsedTimeByGroup = INTERVAL_BASE.map((base) => {
-    const allWorkouts = workoutGroups.flatMap(
-      (group: SingleWorkoutGroup) => group.workoutList
-    );
-    const elapsedTime = getTotalSecondsFromIntervalPerGroup(base, allWorkouts);
+  const elapsedTimeByLane = INTERVAL_BASE.map((base) => {
+    const allGroupsTime = workoutGroups
+      .map(
+        (group) =>
+          getTotalSecondsFromIntervalPerGroup(base, group.workoutList) *
+          group.rounds
+      )
+      .reduce((acc, curr) => acc + curr, 0);
     const groupBreaks = (workoutGroups.length - 1) * GROUP_BREAK_SEC;
-    return getHumanReadableFromSeconds(elapsedTime + groupBreaks);
+    return getHumanReadableFromSeconds(allGroupsTime + groupBreaks);
   });
 
   return (
-    <TableContainer mt={8}>
-      <Table>
+    <TableContainer mt={8} width="4xl" borderWidth="1px" borderRadius={8}>
+      <Table variant="stripe">
         <Thead>
           <Tr>
             {LANE_NAMES.map((lane, i) => (
@@ -42,7 +45,7 @@ export default function ElapsedTimeTable({ workoutGroups }: Props) {
         </Thead>
         <Tbody>
           <Tr>
-            {elapsedTimeByGroup.map((time, i) => (
+            {elapsedTimeByLane.map((time, i) => (
               <Td key={i} textAlign="center">
                 {time}
               </Td>

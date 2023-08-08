@@ -1,4 +1,12 @@
-import { Box, Button, HStack, IconButton, Text } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Flex,
+  HStack,
+  IconButton,
+  Text,
+  Tooltip,
+} from "@chakra-ui/react";
 import { useState } from "react";
 import { MdAdd, MdDelete } from "react-icons/md";
 import WorkoutGroup from "./WorkoutGroup";
@@ -6,6 +14,7 @@ import { SingleWorkoutGroup, WorkoutList } from "./utils/types";
 import { getTotalLapsPerGroup } from "./utils/converter";
 import { BASE_DISTANCE, BASE_LENGTH, DISTANCE_UNIT } from "./utils/const";
 import ElapsedTimeTable from "./ElapsedTimeTable";
+import Printable from "./Printable";
 
 export default function Planner() {
   const [workoutGroups, setWorkoutGroups] = useState<SingleWorkoutGroup[]>([
@@ -48,56 +57,63 @@ export default function Planner() {
   };
 
   const totalLaps = workoutGroups.reduce((agg, curr) => {
-    agg += getTotalLapsPerGroup(curr.workoutList);
+    agg += getTotalLapsPerGroup(curr.workoutList) * curr.rounds;
     return agg;
   }, 0);
 
   return (
     <>
-      {workoutGroups.map((group, i) => (
-        <Box
-          key={i}
-          mb={6}
-          borderBottom="1px"
-          borderColor="gray.200"
-          pb={6}
-          position="relative"
-        >
-          <IconButton
-            aria-label="Delete workout set"
-            icon={<MdDelete />}
-            size="sm"
-            onClick={() => {
-              removeWorkoutGroup(i);
-            }}
-            position="absolute"
-            right="0%"
-          />
-          <WorkoutGroup
-            index={i}
-            {...group}
-            onChangeGroup={updateWorkoutGroup}
-            onChangeWorkoutList={updateWorkoutList}
-          />
+      <Flex align="top" wrap="wrap" gap={8}>
+        <Box width="4xl">
+          {workoutGroups.map((group, i) => (
+            <Box
+              key={i}
+              mb={6}
+              borderBottom="1px"
+              borderColor="gray.200"
+              pb={6}
+              position="relative"
+            >
+              <Tooltip label="Delete this set" aria-label="delete set">
+                <IconButton
+                  aria-label="Delete this set"
+                  icon={<MdDelete />}
+                  size="sm"
+                  onClick={() => {
+                    removeWorkoutGroup(i);
+                  }}
+                  position="absolute"
+                  right="0%"
+                />
+              </Tooltip>
+              <WorkoutGroup
+                index={i}
+                {...group}
+                onChangeGroup={updateWorkoutGroup}
+                onChangeWorkoutList={updateWorkoutList}
+              />
+            </Box>
+          ))}
+          <HStack justify="space-between">
+            <Button leftIcon={<MdAdd />} onClick={() => addWorkoutGroup()}>
+              Workout set
+            </Button>
+            <Text>
+              Total{` `}
+              <Text as="span" fontWeight={700}>
+                {totalLaps}
+              </Text>
+              {` `}laps (
+              <Text as="span" fontWeight={700}>
+                {Math.round(((totalLaps * BASE_DISTANCE) / BASE_LENGTH) * 100) /
+                  100}
+              </Text>
+              {DISTANCE_UNIT})
+            </Text>
+          </HStack>
         </Box>
-      ))}
-      <HStack justify="space-between">
-        <Button leftIcon={<MdAdd />} onClick={() => addWorkoutGroup()}>
-          Workout set
-        </Button>
-        <Text>
-          Total{` `}
-          <Text as="span" fontWeight={700}>
-            {totalLaps}
-          </Text>
-          {` `}laps (
-          <Text as="span" fontWeight={700}>
-            {Math.round(((totalLaps * BASE_DISTANCE) / BASE_LENGTH) * 100) /
-              100}
-          </Text>
-          {DISTANCE_UNIT})
-        </Text>
-      </HStack>
+        <Printable workoutGroups={workoutGroups} />
+      </Flex>
       <ElapsedTimeTable workoutGroups={workoutGroups} />
     </>
   );

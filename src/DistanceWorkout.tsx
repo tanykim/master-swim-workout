@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { SingleDistanceWorkout, TimingType, UpdateInput } from "./utils/types";
 import {
   Box,
@@ -11,8 +11,9 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import NumberInputControl from "./NumberInputControl";
-import { REPEAT_BREAK_SEC, UNIT_W } from "./utils/const";
+import { UNIT_W } from "./utils/const";
 import { MdDelete, MdSubdirectoryArrowRight } from "react-icons/md";
+import WorkoutIntervals from "./WorkoutIntervals";
 
 interface Props extends SingleDistanceWorkout {
   index: number;
@@ -23,7 +24,7 @@ interface Props extends SingleDistanceWorkout {
 const restList: { value: TimingType; label: string }[] = [
   {
     value: "interval",
-    label: "Interval",
+    label: "Interval +",
   },
   { value: "seconds", label: "Rest" },
   { value: "3rd_person", label: "3rd person" },
@@ -36,6 +37,7 @@ export default function DistanceWorkout({
   length,
   description,
   rest,
+  intervalOffset,
   alt,
   onChangeWorkout,
   onChangeSlowLane,
@@ -74,7 +76,7 @@ export default function DistanceWorkout({
         </HStack>
         <VStack align="left" ml={4}>
           <Input
-            width={UNIT_W * 28}
+            width={UNIT_W * 18}
             size="sm"
             autoFocus
             placeholder="Describe workout"
@@ -130,6 +132,14 @@ export default function DistanceWorkout({
               </>
             )}
           </HStack>
+          {timing === "interval" && (
+            <WorkoutIntervals
+              repeats={repeats}
+              length={length}
+              intervalOffset={intervalOffset ?? 0}
+              hideSlowLanes={alt?.restSeconds != null && alt?.restSeconds > 0}
+            />
+          )}
         </VStack>
       </HStack>
       {alt != null && (
@@ -164,14 +174,14 @@ export default function DistanceWorkout({
             {timing === "interval" && (
               <Checkbox
                 size="sm"
-                defaultChecked
-                onChange={(e) =>
+                // defaultChecked
+                onChange={(e) => {
                   onChangeSlowLane(
                     index,
                     "restSeconds",
-                    alt?.intervalOffset ?? REPEAT_BREAK_SEC + 5
-                  )
-                }
+                    e.target.checked ? (intervalOffset ?? 0) + 5 : 0
+                  );
+                }}
                 ml={4}
               >
                 Use rest instead
