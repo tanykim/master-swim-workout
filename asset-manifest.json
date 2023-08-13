@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/master-swim-workout/static/css/main.7d0d9444.css",
-    "main.js": "/master-swim-workout/static/js/main.28849782.js",
+    "main.js": "/master-swim-workout/static/js/main.9641356c.js",
     "static/js/787.ddd09449.chunk.js": "/master-swim-workout/static/js/787.ddd09449.chunk.js",
     "static/media/list-ol.svg": "/master-swim-workout/static/media/list-ol.14fef2e6f0e79b263d06.svg",
     "index.html": "/master-swim-workout/index.html",
@@ -21,11 +21,11 @@
     "static/media/chevron-down.svg": "/master-swim-workout/static/media/chevron-down.8624f04faf16b2d07c00.svg",
     "static/media/type-h1.svg": "/master-swim-workout/static/media/type-h1.4c6eb94d40e1ad820dda.svg",
     "main.7d0d9444.css.map": "/master-swim-workout/static/css/main.7d0d9444.css.map",
-    "main.28849782.js.map": "/master-swim-workout/static/js/main.28849782.js.map",
+    "main.9641356c.js.map": "/master-swim-workout/static/js/main.9641356c.js.map",
     "787.ddd09449.chunk.js.map": "/master-swim-workout/static/js/787.ddd09449.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.7d0d9444.css",
-    "static/js/main.28849782.js"
+    "static/js/main.9641356c.js"
   ]
 }
