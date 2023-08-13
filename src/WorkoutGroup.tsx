@@ -27,6 +27,7 @@ import { BASE_LENGTH, UNIT_W } from "./utils/const";
 import NumberInputControl from "./NumberInputControl";
 import TimedWorkout from "./TimedWorkout";
 import { getTotalLapsPerGroup } from "./utils/converter";
+import { TotalLapsText } from "./TotalLapsText";
 
 interface Props extends SingleWorkoutGroup {
   index: number;
@@ -131,8 +132,9 @@ export default function WorkoutGroup({
     setWorkoutList(prevList);
   };
 
-  // Calculate total length and elapsed time per group
-  const totalLength = getTotalLapsPerGroup(workoutList) * rounds;
+  // Calculate total length per group
+  const totalLaps = getTotalLapsPerGroup(workoutList) * rounds;
+  const totalLapsSlowLane = getTotalLapsPerGroup(workoutList, true) * rounds;
 
   return (
     <Box>
@@ -175,33 +177,14 @@ export default function WorkoutGroup({
                   onChangeWorkout={updateWorkout}
                 />
               )}
-              <IconButton
-                ml={4}
-                aria-label="Move down"
-                icon={<MdArrowDownward />}
-                size="sm"
-                variant="outline"
-                isDisabled={i === workoutList.length - 1}
-                onClick={() => {
-                  moveWorkoutDown(i);
-                }}
-              />
-              <IconButton
-                aria-label="Move up"
-                icon={<MdArrowUpward />}
-                size="sm"
-                variant="outline"
-                isDisabled={i === 0}
-                onClick={() => {
-                  moveWorkoutUp(i);
-                }}
-              />
               <Tooltip
-                label="Add a variable for slower lanes"
+                label="Add a modified version for slower lanes"
                 aria-label="Alternative for slow lanes"
+                hasArrow
               >
                 <IconButton
-                  ml={4}
+                  ml={2}
+                  mr={4}
                   aria-label="Alternative for slow lanes"
                   icon={<MdSubdirectoryArrowRight />}
                   size="sm"
@@ -211,8 +194,37 @@ export default function WorkoutGroup({
                   }}
                 />
               </Tooltip>
-              <Tooltip label="Delete this workout" aria-label="delete workout">
+              <Tooltip label="Move down" aria-label="Move down" hasArrow>
                 <IconButton
+                  aria-label="Move down"
+                  icon={<MdArrowDownward />}
+                  size="sm"
+                  variant="outline"
+                  isDisabled={i === workoutList.length - 1}
+                  onClick={() => {
+                    moveWorkoutDown(i);
+                  }}
+                />
+              </Tooltip>
+              <Tooltip label="Move up" aria-label="Move up" hasArrow>
+                <IconButton
+                  aria-label="Move up"
+                  icon={<MdArrowUpward />}
+                  size="sm"
+                  variant="outline"
+                  isDisabled={i === 0}
+                  onClick={() => {
+                    moveWorkoutUp(i);
+                  }}
+                />
+              </Tooltip>
+              <Tooltip
+                label="Delete this workout"
+                aria-label="delete workout"
+                hasArrow
+              >
+                <IconButton
+                  ml={4}
                   aria-label="Delete this workout"
                   icon={<MdDelete />}
                   size="sm"
@@ -247,11 +259,10 @@ export default function WorkoutGroup({
           </Button>
         </HStack>
         <Text fontSize="sm" color="blue.600">
-          <Text as="span" fontWeight={700}>
-            {totalLength}
-          </Text>
-          {` `}
-          laps
+          <TotalLapsText
+            totalLaps={totalLaps}
+            totalLapsSlowLane={totalLapsSlowLane}
+          />
         </Text>
       </HStack>
     </Box>

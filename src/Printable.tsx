@@ -1,11 +1,12 @@
-import { Box, UnorderedList, ListItem, Text, Button } from "@chakra-ui/react";
 import {
   SingleDistanceWorkout,
   SingleTimedWorkout,
   SingleWorkoutGroup,
 } from "./utils/types";
-import WorkoutIntervals from "./WorkoutIntervals";
+import "./editor/editor.css";
+import { Box, Button, ListItem, Text, UnorderedList } from "@chakra-ui/react";
 import { MdContentCopy } from "react-icons/md";
+import WorkoutIntervals from "./WorkoutIntervals";
 
 export default function Printable({
   workoutGroups,
@@ -13,7 +14,7 @@ export default function Printable({
   workoutGroups: SingleWorkoutGroup[];
 }) {
   return (
-    <Box backgroundColor="blue.100" borderRadius={8} p={4}>
+    <Box backgroundColor="blue.100" borderRadius={8} p={4} marginTop={4}>
       <Button
         colorScheme="blue"
         variant="outline"

@@ -22,7 +22,8 @@ export default function Intervals() {
   const lengths = Array.from({ length: BASE_LENGTH }, (_, i) => i + 1);
   const length_dist = BASE_DISTANCE / BASE_LENGTH;
 
-  const lenList = [0, 1, 2].flatMap((dist) =>
+  // Show up to 4 times of base length
+  const lenList = [0, 1, 2, 3].flatMap((dist) =>
     lengths.map((len, i) => {
       const value = BASE_LENGTH * dist + len; // laps
       const unit = Math.round(length_dist * value * 100) / 100;
@@ -39,7 +40,7 @@ export default function Intervals() {
 
   return (
     <>
-      <RadioGroup defaultValue="ceiling" m={4}>
+      <RadioGroup defaultValue="ceiling" mb={4}>
         <Stack spacing={4} direction="row" align="flex-end">
           <Text>
             Calculated based on {BASE_DISTANCE}

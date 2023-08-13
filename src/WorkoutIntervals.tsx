@@ -20,6 +20,7 @@ export default function WorkoutIntervals({
 
   return (
     <span>
+      @{` `}
       {intervalBase.map((base, i) => (
         <span key={i}>
           {i > 0 && " / "}

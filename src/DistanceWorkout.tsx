@@ -8,6 +8,7 @@ import {
   Input,
   Select,
   Text,
+  Tooltip,
   VStack,
 } from "@chakra-ui/react";
 import NumberInputControl from "./NumberInputControl";
@@ -90,6 +91,7 @@ export default function DistanceWorkout({
               size="sm"
               width={UNIT_W * 9}
               placeholder="Select timing"
+              defaultValue={timing as string}
               onChange={(event) => {
                 onChangeWorkout(index, "rest", event.target.value);
                 setTiming(event.target.value as TimingType);
@@ -187,14 +189,20 @@ export default function DistanceWorkout({
                 Use rest instead
               </Checkbox>
             )}
-            <IconButton
-              aria-label="Delete slow lane"
-              ml={4}
-              icon={<MdDelete />}
-              size="sm"
-              variant="outline"
-              onClick={() => onRemoveSlowLane(index)}
-            />
+            <Tooltip
+              label="Delete modified version for slower lanes"
+              aria-label="delete workout"
+              hasArrow
+            >
+              <IconButton
+                aria-label="Delete slow lane"
+                ml={4}
+                icon={<MdDelete />}
+                size="sm"
+                variant="outline"
+                onClick={() => onRemoveSlowLane(index)}
+              />
+            </Tooltip>
           </HStack>
         </HStack>
       )}
