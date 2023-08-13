@@ -7,9 +7,6 @@
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
     "@lexical/react": "^0.12.0",
-    "@linaria/babel-preset": "^4.5.4",
-    "@linaria/core": "^4.5.4",
-    "@linaria/react": "^4.5.4",
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^13.0.0",
     "@testing-library/user-event": "^13.2.1",
@@ -32,7 +29,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "predeploy": "yarn run build",
+    "deploy": "gh-pages -d build -r https://github.com/tanykim/master-swim-workout.git"
   },
   "eslintConfig": {
     "extends": [
@@ -53,6 +52,8 @@
     ]
   },
   "devDependencies": {
-    "@types/jsdom": "^21.1.1"
-  }
+    "@types/jsdom": "^21.1.1",
+    "gh-pages": "^6.0.0"
+  },
+  "homepage": "https://tanykim.github.io/master-swim-workout/"
 }
