@@ -153,7 +153,7 @@ export default function DistanceWorkout({
               width={UNIT_W}
               max={10}
               min={1}
-              defaultValue={repeats ?? 1}
+              defaultValue={alt.repeats ?? repeats}
               onChange={(value) =>
                 onChangeSlowLane(index, "repeats", parseInt(value))
               }
@@ -165,7 +165,7 @@ export default function DistanceWorkout({
               width={UNIT_W}
               max={64}
               min={1}
-              defaultValue={length ?? 3}
+              defaultValue={alt.length ?? length}
               onChange={(value) =>
                 onChangeSlowLane(index, "length", parseInt(value))
               }
@@ -176,7 +176,7 @@ export default function DistanceWorkout({
             {timing === "interval" && (
               <Checkbox
                 size="sm"
-                // defaultChecked
+                defaultChecked={alt.restSeconds != null && alt.restSeconds > 0}
                 onChange={(e) => {
                   onChangeSlowLane(
                     index,

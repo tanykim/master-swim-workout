@@ -5,8 +5,8 @@ export default function Welcome() {
     <VStack align="left" width="4xl">
       <Text>👋 Hello</Text>
       <Text>
-        This app helps you create workouts for a master swim team composed of
-        swimmers at different pace.
+        This app helps you create workouts for a master swim team that consists
+        of swimmers at various paces.
       </Text>
       <Text>
         Currently, the pool length and intervals are based on Temescal Masters.

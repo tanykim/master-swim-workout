@@ -1,15 +1,7 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { $generateNodesFromDOM } from "@lexical/html";
-import {
-  $getRoot,
-  $getSelection,
-  $insertNodes,
-  $selectAll,
-  LexicalNode,
-  NodeSelection,
-} from "lexical";
-import { $createRootNode } from "lexical/nodes/LexicalRootNode";
+import { $getRoot, $insertNodes, LexicalNode } from "lexical";
 
 interface Props {
   initialHtml: string;
@@ -19,13 +11,7 @@ interface Props {
 const HtmlPlugin = ({ initialHtml, onHtmlChanged }: Props) => {
   const [editor] = useLexicalComposerContext();
 
-  // const [isFirstRender, setIsFirstRender] = useState(true);
-
   useEffect(() => {
-    console.log(initialHtml);
-    // if (!isFirstRender) return;
-    // setIsFirstRender(false);
-
     editor.update(() => {
       const parser = new DOMParser();
       const dom = parser.parseFromString(initialHtml, "text/html");

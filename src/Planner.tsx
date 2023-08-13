@@ -1,7 +1,6 @@
 import {
   Box,
   Button,
-  Flex,
   HStack,
   IconButton,
   Tab,
@@ -78,60 +77,58 @@ export default function Planner() {
         <Tab>🗒 Text editor</Tab>
       </TabList>
       <TabPanels>
-        <TabPanel pt={6} pb={4}>
-          <Flex align="top" wrap="wrap" gap={8}>
-            <Box width="4xl">
-              {workoutGroups.map((group, i) => (
-                <Box
-                  key={i}
-                  mb={6}
-                  borderBottom="1px"
-                  borderColor="gray.200"
-                  pb={6}
-                  position="relative"
-                >
-                  <Tooltip label="Delete this set" aria-label="delete set">
-                    <IconButton
-                      aria-label="Delete this set"
-                      icon={<MdDelete />}
-                      size="sm"
-                      onClick={() => {
-                        removeWorkoutGroup(i);
-                      }}
-                      position="absolute"
-                      right="0%"
-                    />
-                  </Tooltip>
-                  <WorkoutGroup
-                    index={i}
-                    {...group}
-                    onChangeGroup={updateWorkoutGroup}
-                    onChangeWorkoutList={updateWorkoutList}
+        <TabPanel pt={6} pb={4} width="4xl">
+          <Box mb={8}>
+            {workoutGroups.map((group, i) => (
+              <Box
+                key={i}
+                mb={6}
+                borderBottom="1px"
+                borderColor="gray.200"
+                pb={6}
+                position="relative"
+              >
+                <Tooltip label="Delete this set" aria-label="delete set">
+                  <IconButton
+                    aria-label="Delete this set"
+                    icon={<MdDelete />}
+                    size="sm"
+                    onClick={() => {
+                      removeWorkoutGroup(i);
+                    }}
+                    position="absolute"
+                    right="0%"
                   />
-                </Box>
-              ))}
-              <HStack justify="space-between">
-                <Button leftIcon={<MdAdd />} onClick={() => addWorkoutGroup()}>
-                  Workout set
-                </Button>
-                <Text>
-                  Total{` `}
-                  <TotalLapsText
-                    totalLaps={totalLaps}
-                    totalLapsSlowLane={totalLapsSlowLane}
-                  />
-                  {` / `}
-                  <TotalDistanceText
-                    totalLaps={totalLaps}
-                    totalLapsSlowLane={totalLapsSlowLane}
-                  />
-                </Text>
-              </HStack>
-            </Box>
-          </Flex>
+                </Tooltip>
+                <WorkoutGroup
+                  index={i}
+                  {...group}
+                  onChangeGroup={updateWorkoutGroup}
+                  onChangeWorkoutList={updateWorkoutList}
+                />
+              </Box>
+            ))}
+            <HStack justify="space-between">
+              <Button leftIcon={<MdAdd />} onClick={() => addWorkoutGroup()}>
+                Workout set
+              </Button>
+              <Text>
+                Total{` `}
+                <TotalLapsText
+                  totalLaps={totalLaps}
+                  totalLapsSlowLane={totalLapsSlowLane}
+                />
+                {` / `}
+                <TotalDistanceText
+                  totalLaps={totalLaps}
+                  totalLapsSlowLane={totalLapsSlowLane}
+                />
+              </Text>
+            </HStack>
+          </Box>
           <ElapsedTimeTable workoutGroups={workoutGroups} />
         </TabPanel>
-        <TabPanel width="4xl">
+        <TabPanel pt={6} pb={4} width="4xl">
           <TextEditor
             workoutGroups={workoutGroups}
             totalLaps={totalLaps}

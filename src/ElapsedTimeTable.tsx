@@ -1,4 +1,6 @@
 import {
+  Box,
+  Heading,
   Table,
   TableContainer,
   Th,
@@ -32,27 +34,37 @@ export default function ElapsedTimeTable({ workoutGroups }: Props) {
   });
 
   return (
-    <TableContainer mt={8} width="4xl" borderWidth="1px" borderRadius={8}>
-      <Table variant="stripe">
-        <Thead>
-          <Tr>
-            {LANE_NAMES.map((lane, i) => (
-              <Th key={i} textAlign="center">
-                {lane}
-              </Th>
-            ))}
-          </Tr>
-        </Thead>
-        <Tbody>
-          <Tr>
-            {elapsedTimeByLane.map((time, i) => (
-              <Td key={i} textAlign="center">
-                {time}
-              </Td>
-            ))}
-          </Tr>
-        </Tbody>
-      </Table>
-    </TableContainer>
+    <Box>
+      <Heading size="h3" mb={4}>
+        Estimated elapsed time
+      </Heading>
+      <TableContainer
+        width="4xl"
+        borderWidth="1px"
+        borderColor="gray.200"
+        borderRadius={8}
+      >
+        <Table variant="simple">
+          <Thead>
+            <Tr>
+              {LANE_NAMES.map((lane, i) => (
+                <Th key={i} textAlign="center">
+                  {lane}
+                </Th>
+              ))}
+            </Tr>
+          </Thead>
+          <Tbody>
+            <Tr>
+              {elapsedTimeByLane.map((time, i) => (
+                <Td key={i} textAlign="center" borderBottomWidth={0}>
+                  {time}
+                </Td>
+              ))}
+            </Tr>
+          </Tbody>
+        </Table>
+      </TableContainer>
+    </Box>
   );
 }
