@@ -11,7 +11,14 @@ import CopyToClipboardPlugin from "./editor/CopyToClipboardPlugin";
 import "./editor/editor.css";
 import { editorConfig } from "./editor/editorConfig";
 import { getHtmlString, getSeparateHtmlString } from "./utils/converter";
-import { Box, Radio, RadioGroup, HStack } from "@chakra-ui/react";
+import {
+  Box,
+  Radio,
+  RadioGroup,
+  HStack,
+  Alert,
+  AlertIcon,
+} from "@chakra-ui/react";
 import { useState } from "react";
 import { INTERVAL_BASE } from "./utils/const";
 
@@ -48,6 +55,11 @@ export default function TextEditor({
 
   return (
     <Box>
+      <Alert status="info" mb={4}>
+        <AlertIcon />
+        Workouts created with the smart planner is displayed here. You can
+        modify if you want.
+      </Alert>
       <RadioGroup
         onChange={(v) => setDisplayHtml(v as DisplayType)}
         value={displayHtml}
@@ -68,7 +80,7 @@ export default function TextEditor({
           borderColor="gray.200"
           borderWidth={1}
           borderRadius={8}
-          marginTop={6}
+          marginTop={4}
         >
           <ToolbarPlugin />
           <CopyToClipboardPlugin />

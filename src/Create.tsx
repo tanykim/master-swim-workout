@@ -21,7 +21,7 @@ import { TotalLapsText } from "./TotalLapsText";
 import { TotalDistanceText } from "./TotalDistanceText";
 import TextEditor from "./TextEditor";
 
-export default function Planner() {
+export default function Create() {
   const [workoutGroups, setWorkoutGroups] = useState<SingleWorkoutGroup[]>([
     {
       name: "Warm-up set",
@@ -77,7 +77,7 @@ export default function Planner() {
         <Tab>🗒 Text editor</Tab>
       </TabList>
       <TabPanels>
-        <TabPanel pt={6} pb={4} width="4xl">
+        <TabPanel pt={6} pb={4}>
           <Box mb={8}>
             {workoutGroups.map((group, i) => (
               <Box
@@ -128,7 +128,7 @@ export default function Planner() {
           </Box>
           <ElapsedTimeTable workoutGroups={workoutGroups} />
         </TabPanel>
-        <TabPanel pt={6} pb={4} width="4xl">
+        <TabPanel pt={6} pb={4}>
           <TextEditor
             workoutGroups={workoutGroups}
             totalLaps={totalLaps}

@@ -29,21 +29,38 @@ function CustomLink({ children, to, ...props }: LinkProps) {
 export default function Layout() {
   return (
     <ChakraProvider theme={theme}>
-      <Box margin={4}>
-        <Flex justify="space-between">
-          <Link to="/">
-            <Heading as="h1" mb={4} size="lg">
-              Master swim workout
-            </Heading>
-          </Link>
-          <nav>
-            <HStack gap={6} px={4}>
-              <CustomLink to="/create">✏️ Create</CustomLink>
-              <CustomLink to="/intervals">⌛ Intervals</CustomLink>
-            </HStack>
-          </nav>
-        </Flex>
+      <Flex
+        justify="space-between"
+        backgroundColor="blue.50"
+        p={4}
+        borderBottomColor="gray.100"
+        borderBottomWidth={1}
+      >
+        <Heading as="h1" size="lg">
+          Master swim workout
+        </Heading>
+        <nav>
+          <HStack gap={6} px={4}>
+            <CustomLink to="/">🐟 Home</CustomLink>
+            <CustomLink to="/create">✏️ Create</CustomLink>
+            <CustomLink to="/intervals">⌛ Intervals</CustomLink>
+          </HStack>
+        </nav>
+      </Flex>
+      <Box p={4} mb={16} width="4xl">
         <Outlet />
+      </Box>
+      <Box
+        p={4}
+        backgroundColor="gray.50"
+        position="fixed"
+        width="100%"
+        bottom="0"
+        color="gray.500"
+        borderTopColor="gray.100"
+        borderTopWidth={1}
+      >
+        <Text fontSize="sm">Made with 💙 by Tanyoung Kim</Text>
       </Box>
     </ChakraProvider>
   );

@@ -10,9 +10,7 @@ export function TotalDistanceText({
 }) {
   return (
     <>
-      <Text as="span" fontWeight={700}>
-        {getDistanceFromLaps(totalLaps)}
-      </Text>
+      <Text as="span">{getDistanceFromLaps(totalLaps)}</Text>
       <Text as="span">
         {totalLapsSlowLane !== totalLaps && (
           <Text as="span"> ({getDistanceFromLaps(totalLapsSlowLane)})</Text>
