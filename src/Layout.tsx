@@ -47,7 +47,7 @@ export default function Layout() {
           </HStack>
         </nav>
       </Flex>
-      <Box p={4} mb={16} width="4xl">
+      <Box mt={4} mb={16} mx={4} width="4xl">
         <Outlet />
       </Box>
       <Box
