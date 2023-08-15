@@ -1,4 +1,4 @@
-import { NumberFormat } from "../Intervals";
+import { NumberFormat } from "../intervals/Intervals";
 import {
   BASE_DISTANCE,
   BASE_LENGTH,
@@ -12,7 +12,7 @@ import {
   SingleDistanceWorkout,
   SingleTimedWorkout,
   SingleWorkout,
-  SingleWorkoutGroup,
+  SingleWorkoutSet,
   WorkoutList,
 } from "./types";
 
@@ -112,15 +112,21 @@ export function getDistanceFromLaps(laps: number): string {
 }
 
 export function getHtmlString(
-  workoutGroups: SingleWorkoutGroup[],
+  practice: SingleWorkoutSet[],
   totalLaps: number,
   intervalBase = INTERVAL_BASE,
-  totalLapsSlowLane: number = totalLaps,
-  isCombined: boolean = false
+  lanes: "major" | "slow" | "both" = "both",
+  totalLapsAlt: number = totalLaps
 ): string {
-  const groups = workoutGroups.reduce((groupAcc, group, i) => {
-    const { name, rounds, workoutList } = group;
-    groupAcc += `<h2>${name}${rounds > 1 ? ` x ${rounds} rounds` : ""}</h2>`;
+  const groups = practice.reduce((groupAcc, group, i) => {
+    const { name, rounds, roundsAlt, workoutList } = group;
+    groupAcc += `<p/><h2>${name}${
+      rounds > 1
+        ? ` x ${rounds}${
+            lanes === "both" && rounds !== roundsAlt ? ` (${roundsAlt})` : ""
+          } rounds`
+        : ""
+    }</h2>`;
 
     const list = workoutList.reduce((workoutAcc, workout, j) => {
       const { description } = workout;
@@ -128,23 +134,25 @@ export function getHtmlString(
       if (Object.keys(workout).includes("repeats")) {
         const { repeats, length, rest, intervalOffset, restSeconds, alt } =
           workout as SingleDistanceWorkout;
-
-        const isAltRest = alt?.restSeconds != null && alt?.restSeconds > 0;
-        const intervalBaseFiltered =
-          isCombined && isAltRest
-            ? intervalBase.filter((base) => base < 120)
-            : intervalBase;
+        const isAltRest =
+          (rest === "interval" && restSeconds != null && restSeconds > 0) ||
+          lanes === "major";
+        const intervalBaseFiltered = isAltRest
+          ? intervalBase.filter((base) => base < 120)
+          : intervalBase;
 
         listItem = `<li><b>${
           repeats > 1
             ? `${repeats}${
-                alt != null && alt.repeats !== repeats ? `(${alt.repeats})` : ""
+                lanes === "both" && alt != null && alt.repeats !== repeats
+                  ? `(${alt.repeats})`
+                  : ""
               } x `
             : ""
         }
         ${length}L
         ${
-          isCombined && alt != null && alt.length !== length
+          lanes === "both" && alt != null && alt.length !== length
             ? `(${alt.length}L)`
             : ""
         }</b>
@@ -159,7 +167,7 @@ export function getHtmlString(
                 .join(" / ")}`
             : ""
         }
-        ${isCombined && isAltRest ? `(${alt.restSeconds}s rest)` : ""}
+        ${lanes === "both" && isAltRest ? `(${restSeconds}s rest)` : ""}
         ${rest === "seconds" ? `${restSeconds}s rest` : ""}
         ${rest === "3rd_person" ? "3rd person in" : ""}
         </i>
@@ -174,38 +182,39 @@ export function getHtmlString(
 
     // Calculate total length per group
     const totalLaps = getTotalLapsPerGroup(workoutList) * rounds;
-    const totalLapsSlowLane = getTotalLapsPerGroup(workoutList, true) * rounds;
+    const totalLapsAlt =
+      getTotalLapsPerGroup(workoutList, true) * (roundsAlt ?? rounds);
 
-    return `${groupAcc}<ul>${list}</ul><p style="text-align: right"><b>${totalLaps}</b>${
-      isCombined && totalLapsSlowLane !== totalLaps
-        ? `(${totalLapsSlowLane})`
-        : ""
-    } laps</p>`;
+    return `${groupAcc}<ul>${list}</ul><p style="text-align: right"><b>${totalLaps}${
+      lanes === "both" && totalLapsAlt !== totalLaps ? ` (${totalLapsAlt})` : ""
+    }</b> laps</p>`;
   }, "");
 
-  const total = `<b>${totalLaps}</b> laps, ${getDistanceFromLaps(totalLaps)} ${
-    totalLapsSlowLane !== totalLaps
-      ? `(<b>${totalLapsSlowLane}</b> laps,  ${getDistanceFromLaps(
-          totalLapsSlowLane
-        )})`
-      : ""
+  const total = `<b>${totalLaps}${
+    totalLapsAlt !== totalLaps ? ` (${totalLapsAlt})` : ""
+  }</b> laps / ${getDistanceFromLaps(totalLaps)} ${
+    totalLapsAlt !== totalLaps ? `(${getDistanceFromLaps(totalLapsAlt)})` : ""
   }`;
 
-  return `${groups}<p style="text-align: right">Total ${total}</p>`;
+  return `${groups}<p/><p style="text-align: right">Total ${total}</p>`;
 }
 
 export function getSeparateHtmlString(
-  workoutGroups: SingleWorkoutGroup[],
+  practice: SingleWorkoutSet[],
   totalLaps: number,
-  totalLapsSlowLane: number
+  totalLapsAlt: number
 ): string {
-  const majorLanes = getHtmlString(
-    workoutGroups,
-    totalLaps,
-    INTERVAL_BASE.filter((base) => base < 120)
-  );
+  const majorLanes = getHtmlString(practice, totalLaps, INTERVAL_BASE, "major");
 
-  if (totalLaps === totalLapsSlowLane) {
+  const hasAlt = practice
+    .map((group) => {
+      return (
+        group.workoutList.filter((workout) => workout.alt != null).length > 0
+      );
+    })
+    .includes(true);
+
+  if (!hasAlt) {
     return majorLanes;
   }
 
@@ -213,20 +222,22 @@ export function getSeparateHtmlString(
     (lane, i) => INTERVAL_BASE[i] < 120
   ).join(", ");
 
-  const slowLaneWorkoutGroups = workoutGroups.map((group) => {
+  const slowLanePractice = practice.map((group) => {
     const { workoutList } = group;
     return {
       ...group,
+      rounds: group.roundsAlt ?? group.rounds,
       workoutList: workoutList.map((workout) => {
         if (Object.keys(workout).includes("repeats")) {
-          const { alt, rest } = workout as SingleDistanceWorkout;
+          const { alt, rest, restSeconds } = workout as SingleDistanceWorkout;
           return alt != null
             ? {
                 ...alt,
                 rest:
-                  alt.restSeconds != null && alt.restSeconds > 0
+                  rest === "interval" && restSeconds != null && restSeconds > 0
                     ? "seconds"
                     : rest,
+                restSeconds: restSeconds ?? alt.restSeconds,
               }
             : workout;
         } else {
@@ -241,10 +252,11 @@ export function getSeparateHtmlString(
   ).join(", ");
 
   const slowLanes = getHtmlString(
-    slowLaneWorkoutGroups,
-    totalLapsSlowLane,
-    INTERVAL_BASE.filter((base) => base >= 120)
+    slowLanePractice,
+    totalLapsAlt,
+    INTERVAL_BASE.filter((base) => base >= 120),
+    "slow"
   );
 
-  return `<h1>${majorLanesTitle}</h1>${majorLanes}<h1 style={{marginTop: 20px}}>${slowLanesTitle}</h1>${slowLanes}`;
+  return `<h1>${majorLanesTitle}</h1>${majorLanes}<p/><h1>${slowLanesTitle}</h1>${slowLanes}`;
 }

@@ -10,7 +10,7 @@ interface Props {
   width: number;
   max: number;
   min: number;
-  defaultValue: number;
+  value: number;
   step?: number;
   variant?: string;
   onChange: (arg: string) => void;
@@ -19,7 +19,7 @@ export default function NumberInputControl({
   width,
   max,
   min,
-  defaultValue,
+  value,
   step = 1,
   variant,
   onChange,
@@ -31,9 +31,10 @@ export default function NumberInputControl({
       min={min}
       step={step}
       size="sm"
-      defaultValue={defaultValue}
+      value={value}
       variant={variant}
       onChange={(value) => onChange(value)}
+      backgroundColor="white"
     >
       <NumberInputField />
       <NumberInputStepper>

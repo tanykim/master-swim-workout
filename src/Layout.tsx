@@ -47,7 +47,7 @@ export default function Layout() {
           </HStack>
         </nav>
       </Flex>
-      <Box mt={4} mb={16} mx={4} width="4xl">
+      <Box mt={4} mb={16} mx={4}>
         <Outlet />
       </Box>
       <Box
@@ -56,7 +56,7 @@ export default function Layout() {
         position="fixed"
         width="100%"
         bottom="0"
-        color="gray.500"
+        color="gray.600"
         borderTopColor="gray.100"
         borderTopWidth={1}
       >

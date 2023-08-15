@@ -1,8 +1,8 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 import Layout from "./Layout";
-import Intervals from "./Intervals";
-import Create from "./Create";
+import Intervals from "./intervals/Intervals";
+import Create from "./planner/Create";
 import Welcome from "./Welcome";
 import NoMatch from "./NoMatch";
 

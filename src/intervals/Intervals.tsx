@@ -13,7 +13,7 @@ import {
   Text,
   useRadioGroup,
 } from "@chakra-ui/react";
-import { BASE_DISTANCE, BASE_LENGTH, DISTANCE_UNIT } from "./utils/const";
+import { BASE_DISTANCE, BASE_LENGTH, DISTANCE_UNIT } from "../utils/const";
 import IntervalsTable from "./IntervalsTable";
 
 export type NumberFormat = "original" | "round" | "ceiling" | "floor";
@@ -52,7 +52,7 @@ export default function Intervals() {
           <Radio {...getRadioProps({ value: "floor" })}>Floor by 5s</Radio>
         </Stack>
       </RadioGroup>
-      <Accordion defaultIndex={[BASE_LENGTH - 1]} allowMultiple>
+      <Accordion defaultIndex={[BASE_LENGTH - 1]} allowMultiple width="4xl">
         {lenList.map((len, i) => (
           <AccordionItem key={i}>
             <h3>

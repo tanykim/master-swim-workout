@@ -23,7 +23,10 @@ const tabsBaseStyle = defineTabsStyle({
     },
   },
   tabpanel: {
-    padding: 0,
+    paddingTop: 6,
+    paddingBottom: 6,
+    paddingX: 0,
+    width: "4xl",
   },
 });
 

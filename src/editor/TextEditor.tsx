@@ -1,16 +1,18 @@
-import { SingleWorkoutGroup } from "./utils/types";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
 import LexicalErrorBoundary from "@lexical/react/LexicalErrorBoundary";
-import ToolbarPlugin from "./editor/ToolbarPlugin";
-import PreviewPlugin from "./editor/PreviewPlugin";
-import CopyToClipboardPlugin from "./editor/CopyToClipboardPlugin";
-import "./editor/editor.css";
-import { editorConfig } from "./editor/editorConfig";
-import { getHtmlString, getSeparateHtmlString } from "./utils/converter";
+import ToolbarPlugin from "./ToolbarPlugin";
+import PreviewPlugin from "./PreviewPlugin";
+import CopyToClipboardPlugin from "./CopyToClipboardPlugin";
+import { editorConfig } from "./editorConfig";
+import {
+  getHtmlString,
+  getSeparateHtmlString,
+  getTotalLapsPerGroup,
+} from "../utils/converter";
 import {
   Box,
   Radio,
@@ -20,13 +22,9 @@ import {
   AlertIcon,
 } from "@chakra-ui/react";
 import { useState } from "react";
-import { INTERVAL_BASE } from "./utils/const";
-
-interface Props {
-  workoutGroups: SingleWorkoutGroup[];
-  totalLaps: number;
-  totalLapsSlowLane: number;
-}
+import { INTERVAL_BASE } from "../utils/const";
+import { usePractice } from "../utils/PracticeContext";
+import "./editor.css";
 
 export type DisplayType = "separate" | "combined";
 
@@ -35,23 +33,26 @@ const displayTypes: { value: DisplayType; label: string }[] = [
   { value: "combined", label: "Show combined like (slow lanes)" },
 ];
 
-export default function TextEditor({
-  workoutGroups,
-  totalLaps,
-  totalLapsSlowLane,
-}: Props) {
+export default function TextEditor() {
+  const practice = usePractice();
+  const totalLaps = practice.reduce((acc, group) => {
+    acc += getTotalLapsPerGroup(group.workoutList) * group.rounds;
+    return acc;
+  }, 0);
+
+  const totalLapsAlt = practice.reduce((acc, group) => {
+    acc +=
+      getTotalLapsPerGroup(group.workoutList, true) *
+      (group.roundsAlt ?? group.rounds);
+    return acc;
+  }, 0);
+
   const [displayHtml, setDisplayHtml] = useState<DisplayType>("separate");
 
   const htmlString =
     displayHtml === "combined"
-      ? getHtmlString(
-          workoutGroups,
-          totalLaps,
-          INTERVAL_BASE,
-          totalLapsSlowLane,
-          true
-        )
-      : getSeparateHtmlString(workoutGroups, totalLaps, totalLapsSlowLane);
+      ? getHtmlString(practice, totalLaps, INTERVAL_BASE, "both", totalLapsAlt)
+      : getSeparateHtmlString(practice, totalLaps, totalLapsAlt);
 
   return (
     <Box>

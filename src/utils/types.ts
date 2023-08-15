@@ -15,14 +15,16 @@ export interface SingleDistanceWorkout extends SingleWorkout {
 
 export interface SingleTimedWorkout extends SingleWorkout {
   duration: number;
+  alt?: SingleTimedWorkout | null;
 }
 
 export type WorkoutList = (SingleDistanceWorkout | SingleTimedWorkout)[];
 
-export interface SingleWorkoutGroup {
+export interface SingleWorkoutSet {
   name: string;
   rounds: number;
   workoutList: WorkoutList;
+  roundsAlt?: number;
 }
 
 export type UpdateInput = (
@@ -30,3 +32,8 @@ export type UpdateInput = (
   key: string,
   value: number | string
 ) => void;
+
+export type WorkoutProps = {
+  setIndex: number;
+  workoutIndex: number;
+};

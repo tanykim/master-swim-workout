@@ -9,27 +9,25 @@ import {
   Tbody,
   Td,
 } from "@chakra-ui/react";
-import { SingleWorkoutGroup } from "./utils/types";
-import { GROUP_BREAK_SEC, INTERVAL_BASE, LANE_NAMES } from "./utils/const";
+import { GROUP_BREAK_SEC, INTERVAL_BASE, LANE_NAMES } from "../utils/const";
 import {
   getHumanReadableFromSeconds,
   getTotalSecondsFromIntervalPerGroup,
-} from "./utils/converter";
+} from "../utils/converter";
+import { usePractice } from "../utils/PracticeContext";
 
-interface Props {
-  workoutGroups: SingleWorkoutGroup[];
-}
+export default function ElapsedTimeTable() {
+  const practice = usePractice();
 
-export default function ElapsedTimeTable({ workoutGroups }: Props) {
   const elapsedTimeByLane = INTERVAL_BASE.map((base) => {
-    const allGroupsTime = workoutGroups
+    const allGroupsTime = practice
       .map(
         (group) =>
           getTotalSecondsFromIntervalPerGroup(base, group.workoutList) *
-          group.rounds
+          (base < 120 ? group.rounds : group.roundsAlt ?? group.rounds)
       )
       .reduce((acc, curr) => acc + curr, 0);
-    const groupBreaks = (workoutGroups.length - 1) * GROUP_BREAK_SEC;
+    const groupBreaks = (practice.length - 1) * GROUP_BREAK_SEC;
     return getHumanReadableFromSeconds(allGroupsTime + groupBreaks);
   });
 

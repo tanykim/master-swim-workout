@@ -8,8 +8,8 @@ import {
   Thead,
   Tr,
 } from "@chakra-ui/react";
-import { INTERVAL_BASE, LANE_NAMES } from "./utils/const";
-import { getTimeFromInterval } from "./utils/converter";
+import { INTERVAL_BASE, LANE_NAMES } from "../utils/const";
+import { getTimeFromInterval } from "../utils/converter";
 import { NumberFormat } from "./Intervals";
 
 interface Props {
