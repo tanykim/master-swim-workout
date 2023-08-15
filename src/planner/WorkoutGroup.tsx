@@ -41,7 +41,7 @@ export default function WorkoutGroup({
 
   const showSlowLaneRounds =
     workoutList.filter((workout) => workout.alt != null).length > 0 ||
-    roundsAlt !== rounds;
+    (roundsAlt != null && roundsAlt !== rounds);
 
   const totalLaps = getTotalLapsPerGroup(workoutList) * rounds;
   const totalLapsAlt =
@@ -49,7 +49,7 @@ export default function WorkoutGroup({
 
   return (
     <Box mb={6} borderBottom="1px" borderColor="gray.200" pb={6}>
-      <Flex justify="space-between" mb={6}>
+      <Flex justify="space-between" mb={6} wrap="wrap" gap={2}>
         <HStack>
           <Input
             value={name}
@@ -86,27 +86,31 @@ export default function WorkoutGroup({
           />
           <Text fontSize="sm" fontWeight={700}>
             round{rounds === 1 ? "" : "s"}
-            {showSlowLaneRounds ? ` / slow lanes:` : ""}
           </Text>
-          {showSlowLaneRounds && (
-            <NumberInputControl
-              width={UNIT_W}
-              max={10}
-              min={1}
-              value={roundsAlt ?? rounds}
-              variant="filled"
-              onChange={(value) =>
-                dispatch({
-                  level: "set",
-                  type: "update",
-                  setIndex: setIndex,
-                  updates: { key: "roundsAlt", value: parseInt(value) },
-                })
-              }
-            />
-          )}
         </HStack>
-        <HStack>
+        <HStack flexGrow={1} justify="flex-end" wrap="wrap">
+          {showSlowLaneRounds && (
+            <HStack mr={2}>
+              <NumberInputControl
+                width={UNIT_W}
+                max={10}
+                min={1}
+                value={roundsAlt ?? rounds}
+                variant="filled"
+                onChange={(value) =>
+                  dispatch({
+                    level: "set",
+                    type: "update",
+                    setIndex: setIndex,
+                    updates: { key: "roundsAlt", value: parseInt(value) },
+                  })
+                }
+              />
+              <Text fontSize="sm" fontWeight={700}>
+                round{roundsAlt === 1 ? "" : "s"} for slow lanes
+              </Text>
+            </HStack>
+          )}
           {!hideSlowLaneButton && (
             <Tooltip
               label="Add alternative workouts for slower lanes"
@@ -145,7 +149,14 @@ export default function WorkoutGroup({
         </HStack>
       </Flex>
       {workoutList.map((workout, i) => (
-        <Flex key={i} justify="space-between" align="flex-start" mb={6} gap={6}>
+        <Flex
+          key={i}
+          justify="space-between"
+          align="flex-start"
+          mb={6}
+          gap={2}
+          wrap="wrap"
+        >
           {Object.keys(workout).includes("repeats") ? (
             <DistanceWorkout setIndex={setIndex} workoutIndex={i} />
           ) : (
@@ -159,7 +170,7 @@ export default function WorkoutGroup({
         </Flex>
       ))}
       <Flex align="center" justify="space-between">
-        <HStack gap={4}>
+        <HStack gap={2} wrap="wrap">
           <Button
             size="sm"
             colorScheme="blue"
@@ -177,6 +188,7 @@ export default function WorkoutGroup({
                 } as SingleDistanceWorkout,
               })
             }
+            mr={2}
           >
             Distance workout
           </Button>
@@ -200,7 +212,7 @@ export default function WorkoutGroup({
             Timed workout
           </Button>
         </HStack>
-        <Text color="blue.600">
+        <Text color="blue.600" whiteSpace="nowrap">
           <b>
             {totalLaps}
             {showSlowLaneRounds ? ` (${totalLapsAlt}) ` : ` `}

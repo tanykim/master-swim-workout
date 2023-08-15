@@ -60,8 +60,12 @@ function practiceReducer(practice: SingleWorkoutSet[], action: Action) {
         const workoutList = workoutSet.workoutList.map((workout) => {
           return workout.alt != null ? workout : { ...workout, alt: workout };
         });
-        // @ts-ignore
-        prevPractice[setIndex] = { ...workoutSet, workoutList };
+        prevPractice[setIndex] = {
+          ...workoutSet,
+          roundsAlt: workoutSet.roundsAlt ?? workoutSet.rounds,
+          // @ts-ignore
+          workoutList,
+        };
         return prevPractice;
       }
     }

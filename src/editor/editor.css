@@ -128,9 +128,10 @@
   }
   
   .clipboard {
-    position: absolute;
-    right: 8px;
-    top: 8px;
+    display: flex;
+    flex-grow:1;
+    justify-content: flex-end;
+    padding-right: 6px;
   }
 
   .toolbar {
@@ -141,6 +142,7 @@
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
     vertical-align: middle;
+    flex-wrap: wrap
   }
   
   .toolbar button.toolbar-item {

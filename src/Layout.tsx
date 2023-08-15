@@ -19,6 +19,7 @@ function CustomLink({ children, to, ...props }: LinkProps) {
         fontSize="lg"
         fontWeight={match ? 700 : 400}
         textUnderlineOffset={8}
+        mr={4}
       >
         {children}
       </Text>
@@ -35,15 +36,18 @@ export default function Layout() {
         p={4}
         borderBottomColor="gray.100"
         borderBottomWidth={1}
+        wrap="wrap"
+        gap={2}
+        align="center"
       >
-        <Heading as="h1" size="lg">
+        <Heading as="h1" size="lg" whiteSpace="nowrap">
           Master swim workout
         </Heading>
         <nav>
-          <HStack gap={6} px={4}>
+          <HStack gap={2} wrap="wrap">
             <CustomLink to="/">🐟 Home</CustomLink>
             <CustomLink to="/create">✏️ Create</CustomLink>
-            <CustomLink to="/intervals">⌛ Intervals</CustomLink>
+            <CustomLink to="/intervals">⏰️ Intervals</CustomLink>
           </HStack>
         </nav>
       </Flex>

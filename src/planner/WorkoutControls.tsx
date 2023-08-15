@@ -11,7 +11,7 @@ export default function WorkoutControls({
   const dispatch = usePracticeDispatch();
 
   return (
-    <HStack>
+    <HStack justify="flex-end" flexGrow={1}>
       <Tooltip label="Move down" aria-label="Move down" hasArrow>
         <IconButton
           aria-label="Move down"
@@ -48,7 +48,7 @@ export default function WorkoutControls({
       </Tooltip>
       <Tooltip label="Delete this workout" aria-label="delete workout" hasArrow>
         <IconButton
-          ml={4}
+          ml={2}
           aria-label="Delete this workout"
           icon={<MdDelete />}
           size="sm"

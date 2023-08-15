@@ -65,9 +65,9 @@ export default function TextEditor() {
         onChange={(v) => setDisplayHtml(v as DisplayType)}
         value={displayHtml}
       >
-        <HStack gap={4}>
-          {displayTypes.map((type) => (
-            <Radio key={type.value} value={type.value}>
+        <HStack gap={2} wrap="wrap">
+          {displayTypes.map((type, i) => (
+            <Radio key={i} value={type.value} mr={i === 0 ? 2 : 0}>
               {type.label}
             </Radio>
           ))}
@@ -83,8 +83,10 @@ export default function TextEditor() {
           borderRadius={8}
           marginTop={4}
         >
-          <ToolbarPlugin />
-          <CopyToClipboardPlugin />
+          <HStack wrap="wrap" justify="space-between">
+            <ToolbarPlugin />
+            <CopyToClipboardPlugin />
+          </HStack>
           <Box position="relative">
             <RichTextPlugin
               contentEditable={<ContentEditable className="editor-input" />}

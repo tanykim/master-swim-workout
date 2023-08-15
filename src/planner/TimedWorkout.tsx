@@ -14,7 +14,7 @@ export default function TimedWorkout({ setIndex, workoutIndex }: WorkoutProps) {
   ] as SingleTimedWorkout;
 
   const durationInput = (type: "update" | "update-alt") => (
-    <HStack flexShrink={0}>
+    <HStack flexShrink={0} mr={2}>
       <NumberInputControl
         width={UNIT_W}
         max={20}
@@ -62,13 +62,13 @@ export default function TimedWorkout({ setIndex, workoutIndex }: WorkoutProps) {
   );
 
   return (
-    <HStack flexGrow={1} gap={4} align="start">
+    <HStack flexGrow={1} gap={2} align="start" wrap="wrap">
       {durationInput("update")}
       <VStack gap={2} align="left" flexGrow={1}>
         {descriptionInput("update")}
         {alt != null && (
           <SlowLanesWorkout setIndex={setIndex} workoutIndex={workoutIndex}>
-            <HStack gap={4}>
+            <HStack gap={2} wrap="wrap">
               {durationInput("update-alt")}
               {descriptionInput("update-alt")}
             </HStack>

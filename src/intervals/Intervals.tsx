@@ -9,7 +9,7 @@ import {
   Box,
   RadioGroup,
   Radio,
-  Stack,
+  HStack,
   Text,
   useRadioGroup,
 } from "@chakra-ui/react";
@@ -41,18 +41,26 @@ export default function Intervals() {
   return (
     <>
       <RadioGroup defaultValue="ceiling" mb={4}>
-        <Stack spacing={4} direction="row" align="flex-end">
+        <HStack spacing={4} direction="row" align="flex-end" wrap="wrap">
           <Text>
             Calculated based on {BASE_DISTANCE}
             {DISTANCE_UNIT}
           </Text>
-          <Radio {...getRadioProps({ value: "original" })}>Round by 1s</Radio>
-          <Radio {...getRadioProps({ value: "round" })}>Round by 5s</Radio>
-          <Radio {...getRadioProps({ value: "ceiling" })}>Ceiling by 5s</Radio>
-          <Radio {...getRadioProps({ value: "floor" })}>Floor by 5s</Radio>
-        </Stack>
+          <HStack wrap="wrap" gap={2}>
+            <Radio {...getRadioProps({ value: "original" })} mr={2}>
+              Round by 1s
+            </Radio>
+            <Radio {...getRadioProps({ value: "round" })} mr={2}>
+              Round by 5s
+            </Radio>
+            <Radio {...getRadioProps({ value: "ceiling" })} mr={2}>
+              Ceiling by 5s
+            </Radio>
+            <Radio {...getRadioProps({ value: "floor" })}>Floor by 5s</Radio>
+          </HStack>
+        </HStack>
       </RadioGroup>
-      <Accordion defaultIndex={[BASE_LENGTH - 1]} allowMultiple width="4xl">
+      <Accordion defaultIndex={[BASE_LENGTH - 1]} allowMultiple maxWidth="4xl">
         {lenList.map((len, i) => (
           <AccordionItem key={i}>
             <h3>

@@ -25,7 +25,7 @@ export default function Practice() {
       {practice.map((group, i) => (
         <WorkoutGroup key={i} setIndex={i} {...group} />
       ))}
-      <HStack justify="space-between">
+      <HStack justify="space-between" wrap="wrap" gap={2}>
         <Button
           leftIcon={<MdAdd />}
           onClick={() => dispatch({ level: "set", type: "add" })}

@@ -26,7 +26,7 @@ const tabsBaseStyle = defineTabsStyle({
     paddingTop: 6,
     paddingBottom: 6,
     paddingX: 0,
-    width: "4xl",
+    maxWidth: "4xl",
   },
 });
 
@@ -51,7 +51,6 @@ export const theme = extendTheme({
     global: {
       "body, heading": {
         color: "gray.800",
-        lineHeight: "tall",
       },
     },
   },

@@ -44,13 +44,11 @@ export default function DistanceWorkout({
     alt,
   } = practice[setIndex].workoutList[workoutIndex] as SingleDistanceWorkout;
 
-  console.log(workoutIndex, repeats, length);
-
   const distanceInputs = (type: "update" | "update-alt") => (
-    <HStack flexShrink={0}>
+    <HStack flexShrink={0} mr={2}>
       <NumberInputControl
         width={UNIT_W}
-        max={10}
+        max={16}
         min={1}
         value={(type === "update" ? repeats : alt?.repeats) ?? 1}
         onChange={(value) =>
@@ -116,7 +114,7 @@ export default function DistanceWorkout({
   );
 
   return (
-    <HStack flexGrow={1} gap={4} align="start">
+    <HStack flexGrow={1} gap={2} align="start" wrap="wrap">
       {distanceInputs("update")}
       <VStack gap={2} align="left" flexGrow={1}>
         {descriptionInput("update")}
@@ -149,7 +147,7 @@ export default function DistanceWorkout({
             <NumberInputControl
               width={UNIT_W * 1.25}
               min={-20}
-              max={20}
+              max={40}
               step={5}
               value={intervalOffset ?? 0}
               onChange={(value) =>
@@ -223,7 +221,7 @@ export default function DistanceWorkout({
 
         {alt != null && (
           <SlowLanesWorkout setIndex={setIndex} workoutIndex={workoutIndex}>
-            <HStack gap={4}>
+            <HStack gap={2} wrap="wrap">
               {distanceInputs("update-alt")}
               {descriptionInput("update-alt")}
             </HStack>
