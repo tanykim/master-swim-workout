@@ -1,5 +1,13 @@
-import { tabsAnatomy, accordionAnatomy } from "@chakra-ui/anatomy";
-import { createMultiStyleConfigHelpers, extendTheme } from "@chakra-ui/react";
+import {
+  checkboxAnatomy,
+  tabsAnatomy,
+  accordionAnatomy,
+} from "@chakra-ui/anatomy";
+import {
+  createMultiStyleConfigHelpers,
+  defineStyle,
+  extendTheme,
+} from "@chakra-ui/react";
 
 const FONT_FAMILY =
   '"Karla", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto","Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue"';
@@ -13,6 +21,11 @@ const {
   definePartsStyle: defineAccordionStyle,
   defineMultiStyleConfig: defineAccordionConfig,
 } = createMultiStyleConfigHelpers(accordionAnatomy.keys);
+
+const {
+  definePartsStyle: defineCheckboxStyle,
+  defineMultiStyleConfig: defineCheckboxConfig,
+} = createMultiStyleConfigHelpers(checkboxAnatomy.keys);
 
 // define the base component styles
 const tabsBaseStyle = defineTabsStyle({
@@ -34,6 +47,13 @@ const accordionBaseStyle = defineAccordionStyle({
   button: {
     fontWeight: 400,
     _hover: { backgroundColor: "blue.500", color: "white" },
+  },
+});
+
+const checkboxBaseStyle = defineCheckboxStyle({
+  control: {
+    backgroundColor: "white",
+    boxSize: 3.5,
   },
 });
 
@@ -69,5 +89,6 @@ export const theme = extendTheme({
     Accordion: defineAccordionConfig({
       baseStyle: accordionBaseStyle,
     }),
+    Checkbox: defineCheckboxConfig({ baseStyle: checkboxBaseStyle }),
   },
 });

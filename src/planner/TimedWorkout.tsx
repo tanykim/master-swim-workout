@@ -19,7 +19,7 @@ export default function TimedWorkout({ setIndex, workoutIndex }: WorkoutProps) {
         width={UNIT_W}
         max={20}
         min={1}
-        value={duration}
+        value={type === "update" ? duration : alt?.duration ?? 5}
         onChange={(value) =>
           dispatch({
             level: "item",
@@ -43,7 +43,7 @@ export default function TimedWorkout({ setIndex, workoutIndex }: WorkoutProps) {
     <Input
       size="sm"
       placeholder="Describe workout"
-      value={description}
+      value={type === "update" ? description : alt?.description ?? ""}
       autoFocus
       backgroundColor="white"
       onChange={(event) =>
