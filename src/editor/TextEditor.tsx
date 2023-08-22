@@ -95,10 +95,7 @@ export default function TextEditor() {
             />
             <HistoryPlugin />
             <AutoFocusPlugin />
-            <PreviewPlugin
-              onHtmlChanged={(html) => console.log(html)}
-              initialHtml={htmlString}
-            />
+            <PreviewPlugin initialHtml={htmlString} />
           </Box>
         </Box>
       </LexicalComposer>

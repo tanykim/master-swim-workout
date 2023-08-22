@@ -1,16 +1,14 @@
-import React from "react";
 import {
   Box,
   Flex,
   HStack,
   Button,
   Text,
-  Input,
   Tooltip,
   IconButton,
 } from "@chakra-ui/react";
 import { MdAdd, MdDelete } from "react-icons/md";
-import { BASE_LENGTH, UNIT_W } from "../utils/const";
+import { BASE_LENGTH } from "../utils/const";
 import {
   SingleWorkoutSet,
   SingleDistanceWorkout,
@@ -20,133 +18,69 @@ import TimedWorkout from "./TimedWorkout";
 import DistanceWorkout from "./DistanceWorkout";
 import { usePracticeDispatch } from "../utils/PracticeContext";
 import ControlWorkout from "./WorkoutControls";
-import NumberInputControl from "../inputs/ChakraNumberInput";
 import { getTotalLapsPerGroup } from "../utils/converter";
+import WorkoutSetInput from "../inputs/WorkoutSetInput";
 
 interface Props extends SingleWorkoutSet {
   setIndex: number;
+  isAlt?: boolean;
 }
 
+const DISTANCE_WORKOUT = {
+  repeats: 1,
+  length: BASE_LENGTH,
+  description: "",
+  rest: null,
+};
+
+const TIMED_WORKOUT = {
+  duration: 5,
+  description: "",
+};
 export default function WorkoutGroup({
   setIndex,
   name,
   rounds,
-  roundsAlt,
   workoutList,
+  isAlt = false,
 }: Props) {
   const dispatch = usePracticeDispatch();
 
-  const hideSlowLaneButton =
-    workoutList.filter((workout) => workout.alt == null).length === 0;
-
-  const showSlowLaneRounds =
-    workoutList.filter((workout) => workout.alt != null).length > 0 ||
-    (roundsAlt != null && roundsAlt !== rounds);
-
   const totalLaps = getTotalLapsPerGroup(workoutList) * rounds;
-  const totalLapsAlt =
-    getTotalLapsPerGroup(workoutList, true) * (roundsAlt ?? rounds);
 
   return (
     <Box mb={6} borderBottom="1px" borderColor="gray.200" pb={6}>
       <Flex justify="space-between" mb={6} wrap="wrap" gap={2}>
-        <HStack>
-          <Input
-            value={name}
-            variant="filled"
-            size="sm"
-            onChange={(event) =>
-              dispatch({
-                level: "set",
-                type: "update",
-                setIndex: setIndex,
-                updates: { key: "name", value: event.target.value },
-              })
-            }
-            width={UNIT_W * 10}
-            autoFocus
-          />
-          <Text fontSize="sm" fontWeight={700}>
-            X
-          </Text>
-          <NumberInputControl
-            width={UNIT_W}
-            max={10}
-            min={1}
-            value={rounds}
-            variant="filled"
-            onChange={(value) =>
-              dispatch({
-                level: "set",
-                type: "update",
-                setIndex: setIndex,
-                updates: { key: "rounds", value: parseInt(value) },
-              })
-            }
-          />
-          <Text fontSize="sm" fontWeight={700}>
-            round{rounds === 1 ? "" : "s"}
-          </Text>
-        </HStack>
-        <HStack flexGrow={1} justify="flex-end" wrap="wrap">
-          {showSlowLaneRounds && (
-            <HStack mr={2}>
-              <NumberInputControl
-                width={UNIT_W}
-                max={10}
-                min={1}
-                value={roundsAlt ?? rounds}
-                variant="filled"
-                onChange={(value) =>
-                  dispatch({
-                    level: "set",
-                    type: "update",
-                    setIndex: setIndex,
-                    updates: { key: "roundsAlt", value: parseInt(value) },
-                  })
-                }
-              />
-              <Text fontSize="sm" fontWeight={700}>
-                round{roundsAlt === 1 ? "" : "s"} for slow lanes
-              </Text>
-            </HStack>
-          )}
-          {!hideSlowLaneButton && (
+        <WorkoutSetInput
+          setIndex={setIndex}
+          name={name}
+          rounds={rounds}
+          isAlt={isAlt}
+        />
+        {!isAlt && (
+          <HStack flexGrow={1} justify="flex-end" wrap="wrap">
             <Tooltip
-              label="Add alternative workouts for slower lanes"
-              aria-label="add alternative"
+              label={`Remove this ${
+                isAlt ? "variation for slow lanes" : "set"
+              }`}
+              aria-label="remove set"
               hasArrow
             >
-              <Button
-                leftIcon={<MdAdd />}
+              <IconButton
+                aria-label="Remove this set"
+                icon={<MdDelete />}
                 size="sm"
                 onClick={() =>
                   dispatch({
                     level: "set",
-                    type: "add-slow-lanes",
+                    type: isAlt ? "remove-alt" : "remove",
                     setIndex: setIndex,
                   })
                 }
-              >
-                Slow lanes
-              </Button>
+              />
             </Tooltip>
-          )}
-          <Tooltip label="Remove this set" aria-label="remove set" hasArrow>
-            <IconButton
-              aria-label="Remove this set"
-              icon={<MdDelete />}
-              size="sm"
-              onClick={() =>
-                dispatch({
-                  level: "set",
-                  type: "remove",
-                  setIndex: setIndex,
-                })
-              }
-            />
-          </Tooltip>
-        </HStack>
+          </HStack>
+        )}
       </Flex>
       {workoutList.map((workout, i) => (
         <Flex
@@ -158,65 +92,76 @@ export default function WorkoutGroup({
           wrap="wrap"
         >
           {Object.keys(workout).includes("repeats") ? (
-            <DistanceWorkout setIndex={setIndex} workoutIndex={i} />
+            <DistanceWorkout
+              setIndex={setIndex}
+              workoutIndex={i}
+              isAlt={isAlt}
+              {...(workout as SingleDistanceWorkout)}
+            />
           ) : (
-            <TimedWorkout setIndex={setIndex} workoutIndex={i} />
+            <TimedWorkout
+              setIndex={setIndex}
+              workoutIndex={i}
+              isAlt={isAlt}
+              {...(workout as SingleTimedWorkout)}
+            />
           )}
-          <ControlWorkout
-            setIndex={setIndex}
-            workoutIndex={i}
-            isLast={i === workoutList.length - 1}
-          />
+          {!isAlt && (
+            <ControlWorkout
+              setIndex={setIndex}
+              workoutIndex={i}
+              isLast={i === workoutList.length - 1}
+              isAlt={isAlt}
+            />
+          )}
         </Flex>
       ))}
-      <Flex align="center" justify="space-between">
-        <HStack gap={2} wrap="wrap">
-          <Button
-            size="sm"
-            colorScheme="blue"
-            leftIcon={<MdAdd />}
-            onClick={() =>
-              dispatch({
-                level: "list",
-                type: "add",
-                setIndex: setIndex,
-                workout: {
-                  repeats: 1,
-                  length: BASE_LENGTH,
-                  description: "",
-                  rest: null,
-                } as SingleDistanceWorkout,
-              })
-            }
-            mr={2}
-          >
-            Distance workout
-          </Button>
-          <Button
-            size="sm"
-            colorScheme="blue"
-            variant="outline"
-            leftIcon={<MdAdd />}
-            onClick={() =>
-              dispatch({
-                level: "list",
-                type: "add",
-                setIndex: setIndex,
-                workout: {
-                  duration: 5,
-                  description: "",
-                } as SingleTimedWorkout,
-              })
-            }
-          >
-            Timed workout
-          </Button>
-        </HStack>
+      <Flex align="center" justify={isAlt ? "flex-end" : "space-between"}>
+        {!isAlt && (
+          <HStack gap={2} wrap="wrap">
+            <Button
+              size="sm"
+              colorScheme="blue"
+              leftIcon={<MdAdd />}
+              onClick={() =>
+                dispatch({
+                  level: "list",
+                  type: "add",
+                  setIndex: setIndex,
+                  workout: {
+                    ...DISTANCE_WORKOUT,
+                    alt: DISTANCE_WORKOUT,
+                  } as SingleDistanceWorkout,
+                })
+              }
+              mr={2}
+            >
+              Distance workout
+            </Button>
+            <Button
+              size="sm"
+              colorScheme="blue"
+              variant="outline"
+              leftIcon={<MdAdd />}
+              onClick={() =>
+                dispatch({
+                  level: "list",
+                  type: "add",
+                  setIndex: setIndex,
+                  workout: {
+                    ...TIMED_WORKOUT,
+                    alt: TIMED_WORKOUT,
+                  } as SingleTimedWorkout,
+                })
+              }
+            >
+              Timed workout
+            </Button>
+          </HStack>
+        )}
         <Text color="blue.600" whiteSpace="nowrap">
-          <b>
-            {totalLaps}
-            {showSlowLaneRounds ? ` (${totalLapsAlt}) ` : ` `}
-          </b>
+          <b>{totalLaps}</b>
+          {` `}
           laps
         </Text>
       </Flex>

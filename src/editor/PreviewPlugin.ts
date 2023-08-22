@@ -5,10 +5,9 @@ import { $getRoot, $insertNodes, LexicalNode } from "lexical";
 
 interface Props {
   initialHtml: string;
-  onHtmlChanged: (html: string) => void;
 }
 
-const HtmlPlugin = ({ initialHtml, onHtmlChanged }: Props) => {
+const HtmlPlugin = ({ initialHtml }: Props) => {
   const [editor] = useLexicalComposerContext();
 
   useEffect(() => {

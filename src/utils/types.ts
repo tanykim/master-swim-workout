@@ -24,7 +24,7 @@ export interface SingleWorkoutSet {
   name: string;
   rounds: number;
   workoutList: WorkoutList;
-  roundsAlt?: number;
+  roundsAlt?: number | null;
 }
 
 export type UpdateInput = (
@@ -36,4 +36,5 @@ export type UpdateInput = (
 export type WorkoutProps = {
   setIndex: number;
   workoutIndex: number;
+  isAlt: boolean;
 };

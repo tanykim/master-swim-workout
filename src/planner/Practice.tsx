@@ -1,24 +1,22 @@
-import { Box, HStack, Button, Text } from "@chakra-ui/react";
-import { MdAdd } from "react-icons/md";
+import { Box, HStack, Button, VStack } from "@chakra-ui/react";
+import { MdAdd, MdRemove } from "react-icons/md";
 import { usePractice, usePracticeDispatch } from "../utils/PracticeContext";
 import WorkoutGroup from "./WorkoutGroup";
-import { getDistanceFromLaps, getTotalLapsPerGroup } from "../utils/converter";
+import SlowLanePractice from "./SlowLanePractice";
+import TotalDistance from "./TotalDistance";
 
 export default function Practice() {
   const practice = usePractice();
   const dispatch = usePracticeDispatch();
 
-  const totalLaps = practice.reduce((acc, group) => {
-    acc += getTotalLapsPerGroup(group.workoutList) * group.rounds;
-    return acc;
-  }, 0);
-
-  const totalLapsAlt = practice.reduce((acc, group) => {
-    acc +=
-      getTotalLapsPerGroup(group.workoutList, true) *
-      (group.roundsAlt ?? group.rounds);
-    return acc;
-  }, 0);
+  const hasAlt =
+    practice.filter((workout) => {
+      const { rounds, roundsAlt, workoutList } = workout;
+      return (
+        (roundsAlt != null && roundsAlt !== rounds) ||
+        workoutList.filter((workout) => workout.alt != null).length > 0
+      );
+    }).length > 0;
 
   return (
     <Box mb={12}>
@@ -32,18 +30,27 @@ export default function Practice() {
         >
           Workout set
         </Button>
-        <Text>
-          Total{` `}
-          <b>
-            {totalLaps}
-            {totalLaps !== totalLapsAlt ? ` (${totalLapsAlt}) ` : ` `}
-          </b>
-          laps / {getDistanceFromLaps(totalLaps)}
-          {totalLaps !== totalLapsAlt
-            ? ` (${getDistanceFromLaps(totalLapsAlt)}) `
-            : ` `}
-        </Text>
+        <TotalDistance practice={practice} />
       </HStack>
+      <VStack align="flex-end" mt={4}>
+        {hasAlt ? (
+          <SlowLanePractice />
+        ) : (
+          <Button
+            leftIcon={<MdAdd />}
+            size="sm"
+            onClick={() => {
+              dispatch({
+                level: "practice",
+                type: "add-slow-lanes",
+              });
+            }}
+            width="fit-content"
+          >
+            Slow lane variation
+          </Button>
+        )}
+      </VStack>
     </Box>
   );
 }

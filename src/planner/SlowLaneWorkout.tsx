@@ -8,7 +8,7 @@ interface Props {
   children: React.ReactNode;
 }
 
-export default function SlowLanesWorkout({
+export default function SlowLaneWorkout({
   setIndex,
   workoutIndex,
   children,

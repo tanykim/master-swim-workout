@@ -54,7 +54,12 @@ export default function WorkoutControls({
           size="sm"
           variant="outline"
           onClick={() =>
-            dispatch({ level: "list", setIndex, workoutIndex, type: "remove" })
+            dispatch({
+              level: "list",
+              setIndex,
+              workoutIndex,
+              type: "remove",
+            })
           }
         />
       </Tooltip>

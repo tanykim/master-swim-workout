@@ -2,6 +2,7 @@ import { createContext, useContext, useReducer } from "react";
 import {
   SingleDistanceWorkout,
   SingleTimedWorkout,
+  SingleWorkout,
   SingleWorkoutSet,
 } from "./types";
 
@@ -14,12 +15,13 @@ const initialPractice: SingleWorkoutSet[] = [
 ];
 
 interface Action {
-  level: "set" | "list" | "item";
+  level: "practice" | "set" | "list" | "item";
   type:
+    | "add-slow-lanes"
+    | "remove-slow-lanes"
     | "add"
     | "remove"
     | "update"
-    | "add-slow-lanes"
     | "move-up"
     | "move-down"
     | "update-alt"
@@ -31,9 +33,39 @@ interface Action {
 }
 
 function practiceReducer(practice: SingleWorkoutSet[], action: Action) {
+  const prevPractice = [...practice];
+
+  if (action.level === "practice") {
+    switch (action.type) {
+      case "add-slow-lanes": {
+        return prevPractice.map((workoutSet) => {
+          const workoutList = workoutSet.workoutList.map((workout) => {
+            return workout.alt != null ? workout : { ...workout, alt: workout };
+          });
+          return {
+            ...workoutSet,
+            roundsAlt: workoutSet.rounds,
+            workoutList,
+          } as SingleWorkoutSet;
+        });
+      }
+      case "remove-slow-lanes": {
+        return prevPractice.map((workoutSet) => {
+          const workoutList = workoutSet.workoutList.map((workout) => {
+            return { ...workout, alt: null };
+          });
+          return {
+            name: workoutSet.name,
+            rounds: workoutSet.rounds,
+            workoutList,
+          } as SingleWorkoutSet;
+        });
+      }
+    }
+  }
+
   // Selected workout set
   const setIndex = action.setIndex ?? 0;
-  const prevPractice = [...practice];
   const workoutSet = prevPractice[setIndex];
 
   if (action.level === "set") {
@@ -55,18 +87,6 @@ function practiceReducer(practice: SingleWorkoutSet[], action: Action) {
       }
       case "remove": {
         return practice.filter((_, i) => i !== action.setIndex);
-      }
-      case "add-slow-lanes": {
-        const workoutList = workoutSet.workoutList.map((workout) => {
-          return workout.alt != null ? workout : { ...workout, alt: workout };
-        });
-        prevPractice[setIndex] = {
-          ...workoutSet,
-          roundsAlt: workoutSet.roundsAlt ?? workoutSet.rounds,
-          // @ts-ignore
-          workoutList,
-        };
-        return prevPractice;
       }
     }
   }
@@ -132,17 +152,11 @@ function practiceReducer(practice: SingleWorkoutSet[], action: Action) {
         prevWorkoutList[workoutIndex] = {
           ...workout,
           alt: {
-            ...workout,
+            ...(workout.alt ?? workout),
             [action.updates.key]: action.updates.value,
           },
         };
         break;
-      }
-      case "remove-alt": {
-        prevWorkoutList[workoutIndex] = {
-          ...workout,
-          alt: null,
-        };
       }
     }
     prevPractice[setIndex] = {

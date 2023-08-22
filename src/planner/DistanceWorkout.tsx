@@ -1,21 +1,15 @@
-import {
-  HStack,
-  VStack,
-  Input,
-  Text,
-  Select,
-  Checkbox,
-} from "@chakra-ui/react";
+import { HStack, VStack, Text, Select } from "@chakra-ui/react";
 import NumberInputControl from "../inputs/ChakraNumberInput";
 import WorkoutIntervals from "./WorkoutIntervals";
-import { UNIT_W } from "../utils/const";
+import { INTERVAL_BASE, UNIT_W } from "../utils/const";
 import {
   TimingType,
   WorkoutProps,
   SingleDistanceWorkout,
 } from "../utils/types";
-import { usePractice, usePracticeDispatch } from "../utils/PracticeContext";
-import SlowLanesWorkout from "./SlowLanesWorkout";
+import { usePracticeDispatch } from "../utils/PracticeContext";
+import DistanceInput from "../inputs/DistanceInput";
+import DescriptionInput from "../inputs/DescriptionInput";
 
 const restList: { value: TimingType; label: string }[] = [
   {
@@ -30,112 +24,51 @@ const restList: { value: TimingType; label: string }[] = [
 export default function DistanceWorkout({
   setIndex,
   workoutIndex,
-}: WorkoutProps) {
-  const practice = usePractice();
+  isAlt,
+  repeats,
+  length,
+  description,
+  rest,
+  intervalOffset,
+  restSeconds,
+}: WorkoutProps & SingleDistanceWorkout) {
   const dispatch = usePracticeDispatch();
-
-  const {
-    repeats,
-    length,
-    description,
-    rest,
-    intervalOffset,
-    restSeconds,
-    alt,
-  } = practice[setIndex].workoutList[workoutIndex] as SingleDistanceWorkout;
-
-  const distanceInputs = (type: "update" | "update-alt") => (
-    <HStack flexShrink={0} mr={2}>
-      <NumberInputControl
-        width={UNIT_W}
-        max={16}
-        min={1}
-        value={(type === "update" ? repeats : alt?.repeats) ?? 1}
-        onChange={(value) =>
-          dispatch({
-            level: "item",
-            setIndex,
-            workoutIndex,
-            type,
-            updates: {
-              key: "repeats",
-              value: parseInt(value),
-            },
-          })
-        }
-      />
-      <Text fontSize="sm" fontWeight={700}>
-        X
-      </Text>
-      <NumberInputControl
-        width={UNIT_W}
-        max={64}
-        min={1}
-        value={(type === "update" ? length : alt?.length) ?? 3}
-        onChange={(value) =>
-          dispatch({
-            level: "item",
-            setIndex,
-            workoutIndex,
-            type,
-            updates: {
-              key: "length",
-              value: parseInt(value),
-            },
-          })
-        }
-      />
-      <Text fontSize="sm" fontWeight={700}>
-        L
-      </Text>
-    </HStack>
-  );
-
-  const descriptionInput = (type: "update" | "update-alt") => (
-    <Input
-      size="sm"
-      autoFocus
-      placeholder="Describe workout"
-      value={type === "update" ? description : alt?.description ?? ""}
-      backgroundColor="white"
-      onChange={(event) =>
-        dispatch({
-          level: "item",
-          setIndex,
-          workoutIndex,
-          type,
-          updates: {
-            key: "description",
-            value: event.target.value,
-          },
-        })
-      }
-    />
-  );
 
   return (
     <HStack flexGrow={1} gap={2} align="start" wrap="wrap">
-      {distanceInputs("update")}
+      <DistanceInput
+        type={isAlt ? "update-alt" : "update"}
+        setIndex={setIndex}
+        workoutIndex={workoutIndex}
+        repeats={repeats}
+        length={length}
+        isAlt={isAlt}
+      />
       <VStack gap={2} align="left" flexGrow={1}>
-        {descriptionInput("update")}
+        <DescriptionInput
+          type={isAlt ? "update-alt" : "update"}
+          setIndex={setIndex}
+          workoutIndex={workoutIndex}
+          description={description}
+        />
         <HStack gap={2}>
           <Select
             size="sm"
             width={UNIT_W * 9}
-            placeholder="Select timing"
-            value={rest ?? ""}
+            value={rest ?? "no_timing"}
             onChange={(event) =>
               dispatch({
                 level: "item",
                 setIndex,
                 workoutIndex,
-                type: "update",
+                type: isAlt ? "update-alt" : "update",
                 updates: {
                   key: "rest",
                   value: event.target.value,
                 },
               })
             }
+            backgroundColor="white"
           >
             {restList.map((rest) => (
               <option key={rest.value} value={rest.value}>
@@ -155,7 +88,7 @@ export default function DistanceWorkout({
                   level: "item",
                   setIndex,
                   workoutIndex,
-                  type: "update",
+                  type: isAlt ? "update-alt" : "update",
                   updates: {
                     key: "intervalOffset",
                     value: parseInt(value),
@@ -176,7 +109,7 @@ export default function DistanceWorkout({
                   level: "item",
                   setIndex,
                   workoutIndex,
-                  type: "update",
+                  type: isAlt ? "update-alt" : "update",
                   updates: {
                     key: "restSeconds",
                     value: parseInt(value),
@@ -188,44 +121,18 @@ export default function DistanceWorkout({
           {(rest === "seconds" || rest === "interval") && (
             <Text fontSize="sm">sec</Text>
           )}
-          {rest === "interval" && (
-            <Checkbox
-              size="sm"
-              defaultChecked={restSeconds != null && restSeconds > 0}
-              onChange={(e) =>
-                dispatch({
-                  level: "item",
-                  setIndex,
-                  workoutIndex,
-                  type: "update",
-                  updates: {
-                    key: "restSeconds",
-                    value: e.target.checked ? (intervalOffset ?? 0) + 5 : 0,
-                  },
-                })
-              }
-              ml={4}
-            >
-              Seconds rest for slow lanes
-            </Checkbox>
-          )}
         </HStack>
         {rest === "interval" && (
           <WorkoutIntervals
             repeats={repeats}
             length={length}
             intervalOffset={intervalOffset ?? 0}
-            restSeconds={restSeconds ?? 0}
+            intervalBase={
+              isAlt
+                ? INTERVAL_BASE.filter((base) => base >= 120)
+                : INTERVAL_BASE
+            }
           />
-        )}
-
-        {alt != null && (
-          <SlowLanesWorkout setIndex={setIndex} workoutIndex={workoutIndex}>
-            <HStack gap={2} wrap="wrap">
-              {distanceInputs("update-alt")}
-              {descriptionInput("update-alt")}
-            </HStack>
-          </SlowLanesWorkout>
         )}
       </VStack>
     </HStack>

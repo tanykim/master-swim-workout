@@ -137,9 +137,10 @@ export function getHtmlString(
         const isAltRest =
           (rest === "interval" && restSeconds != null && restSeconds > 0) ||
           lanes === "major";
-        const intervalBaseFiltered = isAltRest
-          ? intervalBase.filter((base) => base < 120)
-          : intervalBase;
+        const intervalBaseFiltered =
+          lanes === "major"
+            ? intervalBase.filter((base) => base < 120)
+            : intervalBase;
 
         listItem = `<li><b>${
           repeats > 1
