@@ -2,8 +2,8 @@ import { usePractice, usePracticeDispatch } from "../utils/PracticeContext";
 import { Box, Flex, Heading, IconButton, Tooltip } from "@chakra-ui/react";
 import WorkoutGroup from "./WorkoutGroup";
 import TotalDistance from "./TotalDistance";
-import { INTERVAL_BASE, LANE_NAMES } from "../utils/const";
 import { MdDelete } from "react-icons/md";
+import { getLaneNames } from "../utils/converter";
 
 export default function SlowLanePractice() {
   const practice = usePractice();
@@ -31,9 +31,7 @@ export default function SlowLanePractice() {
       backgroundColor="gray.50"
     >
       <Flex justify="space-between" mb={4}>
-        <Heading size="md">
-          {LANE_NAMES.filter((name, i) => INTERVAL_BASE[i] >= 120).join(", ")}
-        </Heading>
+        <Heading size="md">{getLaneNames()}</Heading>
         <Tooltip
           label="Delete slow lane variation"
           aria-label="delete slow lane variation"

@@ -2,7 +2,6 @@ import { createContext, useContext, useReducer } from "react";
 import {
   SingleDistanceWorkout,
   SingleTimedWorkout,
-  SingleWorkout,
   SingleWorkoutSet,
 } from "./types";
 

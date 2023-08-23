@@ -128,10 +128,7 @@ export default function WorkoutGroup({
                   level: "list",
                   type: "add",
                   setIndex: setIndex,
-                  workout: {
-                    ...DISTANCE_WORKOUT,
-                    alt: DISTANCE_WORKOUT,
-                  } as SingleDistanceWorkout,
+                  workout: DISTANCE_WORKOUT as SingleDistanceWorkout,
                 })
               }
               mr={2}
@@ -148,10 +145,7 @@ export default function WorkoutGroup({
                   level: "list",
                   type: "add",
                   setIndex: setIndex,
-                  workout: {
-                    ...TIMED_WORKOUT,
-                    alt: TIMED_WORKOUT,
-                  } as SingleTimedWorkout,
+                  workout: TIMED_WORKOUT as SingleTimedWorkout,
                 })
               }
             >

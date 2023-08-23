@@ -9,8 +9,8 @@ import PreviewPlugin from "./PreviewPlugin";
 import CopyToClipboardPlugin from "./CopyToClipboardPlugin";
 import { editorConfig } from "./editorConfig";
 import {
-  getHtmlString,
-  getSeparateHtmlString,
+  getCombinedHtmlString,
+  getGroupedHtmlString,
   getTotalLapsPerGroup,
 } from "../utils/converter";
 import {
@@ -22,7 +22,6 @@ import {
   AlertIcon,
 } from "@chakra-ui/react";
 import { useState } from "react";
-import { INTERVAL_BASE } from "../utils/const";
 import { usePractice } from "../utils/PracticeContext";
 import "./editor.css";
 
@@ -51,8 +50,9 @@ export default function TextEditor() {
 
   const htmlString =
     displayHtml === "combined"
-      ? getHtmlString(practice, totalLaps, INTERVAL_BASE, "both", totalLapsAlt)
-      : getSeparateHtmlString(practice, totalLaps, totalLapsAlt);
+      ? getCombinedHtmlString(practice, totalLaps, totalLapsAlt)
+      : // ? getHtmlString(practice, totalLaps, INTERVAL_BASE, "both", totalLapsAlt)
+        getGroupedHtmlString(practice, totalLaps, totalLapsAlt);
 
   return (
     <Box>
