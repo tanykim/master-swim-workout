@@ -1,13 +1,18 @@
 import { HStack, Tooltip, IconButton } from "@chakra-ui/react";
 import { MdArrowDownward, MdArrowUpward, MdDelete } from "react-icons/md";
-import { WorkoutProps } from "../utils/types";
 import { usePracticeDispatch } from "../utils/PracticeContext";
+
+interface Props {
+  setIndex: number;
+  workoutIndex: number;
+  isLast: boolean;
+}
 
 export default function WorkoutControls({
   setIndex,
   workoutIndex,
   isLast,
-}: WorkoutProps & { isLast: boolean }) {
+}: Props) {
   const dispatch = usePracticeDispatch();
 
   return (

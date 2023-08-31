@@ -54,13 +54,20 @@ export function getTimeFromInterval(
   return getHumanReadableFromSeconds(totalSec);
 }
 
-export function getTotalLapsPerGroup(workoutList: WorkoutList, useAlt = false) {
+export function getTotalLapsPerGroup(
+  workoutList: WorkoutList,
+  speed: "slow" | "medium" | "fast" = "fast"
+) {
   return workoutList.reduce((acc: number, curr: SingleWorkout) => {
     if (Object.keys(curr).includes("repeats")) {
-      const { repeats, length, alt } = curr as SingleDistanceWorkout;
+      const { repeats, length, alt, altM } = curr as SingleDistanceWorkout;
       return (
         acc +
-        (alt != null && useAlt ? alt?.length * alt?.repeats : length * repeats)
+        (alt != null && speed === "slow"
+          ? alt.length * alt.repeats
+          : altM != null && speed === "medium"
+          ? altM.length * altM.repeats
+          : length * repeats)
       );
     } else {
       return acc;
@@ -72,17 +79,26 @@ export function getTotalSecondsFromIntervalPerDistanceWorkout(
   base: number,
   workout: SingleDistanceWorkout
 ) {
-  const { repeats, alt, length, intervalOffset, restSeconds } = workout;
+  const { repeats, alt, altM, length, intervalOffset, restSeconds } = workout;
 
   // Check slow lane alternative;
-  const totalLen =
-    base >= 120 && alt != null ? alt.repeats * alt.length : repeats * length;
+  let totalLen = repeats * length;
+  if (base >= 120 && alt != null) {
+    totalLen = alt.repeats * alt.length;
+  } else if (base > 90 && base < 120 && altM != null) {
+    totalLen = altM.repeats * altM.length;
+  }
+
   return getTotalSecondsFromInterval(
     base,
     totalLen,
     "ceiling",
     repeats *
-      (alt?.restSeconds ?? restSeconds ?? intervalOffset ?? REPEAT_BREAK_SEC)
+      (alt?.restSeconds ??
+        altM?.restSeconds ??
+        restSeconds ??
+        intervalOffset ??
+        REPEAT_BREAK_SEC)
   );
 }
 
@@ -105,7 +121,10 @@ export function getTotalSecondsFromIntervalPerGroup(
   }, 0);
 }
 
-export function getDistanceFromLaps(laps: number): string {
+export function getDistanceFromLaps(laps: number | null): string | null {
+  if (laps == null) {
+    return null;
+  }
   const distance =
     Math.round(((laps * BASE_DISTANCE) / BASE_LENGTH) * 100) / 100;
   return `${distance}${DISTANCE_UNIT}`;
@@ -122,175 +141,321 @@ function getHtmlBlock(
 
 function getAltText(
   val: number | string,
+  altValM: number | string | null | undefined,
   altVal: number | string | null | undefined
 ): string {
-  return `${val}${val !== altVal && altVal != null ? `(${altVal})` : ""}`;
+  const hasAltM = altValM != null;
+  const hasAlt = altVal != null;
+
+  if (val === altValM && val === altVal) {
+    return `${val}`;
+  }
+  return `${val}${
+    hasAltM && hasAlt && (val !== altValM || val !== altVal)
+      ? `(${altValM ?? val}/${altVal ?? val})`
+      : hasAltM && !hasAlt && val !== altValM
+      ? `(${altValM ?? val})`
+      : !hasAltM && hasAlt && val !== altVal
+      ? `(${altVal ?? val})`
+      : ""
+  }`;
 }
 
 function getXText(
   val: number,
-  altVal?: number | null | undefined,
+  altValM?: number | null,
+  altVal?: number | null,
   tail?: string
 ): string {
-  if (val <= 1 && altVal !== 0) {
+  if (val * (altValM ?? 1) * (altVal ?? 1) === 1) {
     return "";
   }
-  const xText = altVal != null ? getAltText(val, altVal) : val;
+  const xText = getAltText(val, altValM, altVal);
+
   return tail != null
-    ? `x ${xText} ${tail}${val === 1 ? "" : "s"}`
+    ? `x ${xText}${tail}${val === 1 ? "" : "s"}`
     : `${xText} x `;
 }
 
 function getIntervalText(
-  alt: SingleDistanceWorkout,
   length: number,
-  offset: number | undefined
+  offset: number | undefined,
+  laneSpeed: "slow" | "medium" | "fast" | "all",
+  hasMedium: boolean,
+  hasSlow: boolean,
+  alt?: SingleDistanceWorkout
 ): string {
-  const { rest, restSeconds, intervalOffset: altOffset } = alt;
-  const bases =
-    rest === "interval"
-      ? INTERVAL_BASE
-      : INTERVAL_BASE.filter((base) => base < 120);
+  let bases = INTERVAL_BASE;
+  const isSlowRestSec =
+    hasSlow && alt?.restSeconds != null && alt?.restSeconds > 0;
+
+  if (isSlowRestSec || (laneSpeed === "fast" && !hasMedium)) {
+    bases = bases.filter((base) => base < 120);
+  } else if (laneSpeed === "slow") {
+    bases = bases.filter((base) => base >= 120);
+  } else if (laneSpeed === "medium") {
+    bases = bases.filter((base) => base > 90 && base < 120);
+  } else if (laneSpeed === "fast" && hasMedium) {
+    bases = bases.filter((base) => base <= 90);
+  }
 
   const intervalText = `@ ${bases
-    .map((base, i) =>
-      getTimeFromInterval(
-        base,
-        length,
-        "ceiling",
-        base < 120 ? offset : altOffset
-      )
-    )
+    .map((base, i) => getTimeFromInterval(base, length, "ceiling", offset))
     .join(" / ")}`;
 
-  const secText = restSeconds != null ? ` (${restSeconds}s rest)` : "";
-  return `${intervalText}${secText}`;
+  return `${intervalText}${
+    isSlowRestSec ? ` (${alt?.restSeconds}s rest)` : ""
+  }`;
+}
+
+export function getLaneNames(
+  type: "slow" | "medium" | "fast",
+  hasMedium = true,
+  hasSlow = true
+): string {
+  let lanes = LANE_NAMES;
+  if (type === "slow" && hasSlow) {
+    lanes = lanes.filter((name, i) => INTERVAL_BASE[i] >= 120);
+  } else if (type === "medium" && hasMedium) {
+    lanes = lanes.filter(
+      (name, i) => INTERVAL_BASE[i] > 90 && INTERVAL_BASE[i] < 120
+    );
+  } else if (type === "fast" && hasMedium && hasSlow) {
+    lanes = lanes.filter((name, i) => INTERVAL_BASE[i] <= 90);
+  } else if (type === "fast" && !hasMedium && hasSlow) {
+    lanes = lanes.filter((name, i) => INTERVAL_BASE[i] < 120);
+  }
+  return lanes.join(", ");
+}
+
+export function getAllLaneNames(hasMedium = true, hasSlow = true): string {
+  const fastLanes = LANE_NAMES.filter(
+    (name, i) => INTERVAL_BASE[i] < 120 && INTERVAL_BASE[i] <= 90
+  );
+  const mediumLanes = LANE_NAMES.filter(
+    (name, i) => INTERVAL_BASE[i] > 90 && INTERVAL_BASE[i] < 120
+  );
+  const slowLanes = LANE_NAMES.filter((name, i) => INTERVAL_BASE[i] >= 120);
+
+  if (hasMedium) {
+    return `${fastLanes.join(", ")} (${mediumLanes.join(
+      ", "
+    )} / ${slowLanes.join(", ")})`;
+  } else if (hasSlow) {
+    return `${[...fastLanes, ...mediumLanes].join(", ")} (${slowLanes.join(
+      ", "
+    )})`;
+  }
+  return [...fastLanes, ...mediumLanes, ...slowLanes].join(", ");
 }
 
 export function getCombinedHtmlString(
   practice: SingleWorkoutSet[],
-  totalLaps: number,
-  totalLapsAlt: number
+  laneSpeed: "slow" | "medium" | "fast" | "all",
+  hasMedium: boolean = false,
+  hasSlow: boolean = false
 ): string {
   const practiceText = practice.flatMap((set) => {
-    const { name, rounds, roundsAlt, workoutList } = set;
+    const { name, rounds, roundsAltM, roundsAlt, workoutList } = set;
     if (rounds === 0) {
       return [];
     }
+    const mediumRounds = hasMedium ? roundsAltM ?? rounds : null;
+    const slowRounds = hasSlow ? roundsAlt ?? rounds : null;
     const setTitle = getHtmlBlock(
-      `${name} ${getXText(rounds, roundsAlt, "round")}`,
+      `${name} ${getXText(rounds, mediumRounds, slowRounds, " round")}`,
       "h2"
     );
     const workoutListText = workoutList.flatMap((workout) => {
       const description = workout.description || "Swim";
       if (Object.keys(workout).includes("repeats")) {
-        const { repeats, length, rest, intervalOffset, restSeconds, alt } =
-          workout as SingleDistanceWorkout;
+        const {
+          repeats,
+          length,
+          rest,
+          intervalOffset,
+          restSeconds,
+          alt,
+          altM,
+        } = workout as SingleDistanceWorkout;
         if (repeats === 0) {
           return [];
         }
+        const mediumRepeats = hasMedium ? altM?.repeats ?? repeats : null;
+        const slowRepeats = hasSlow ? alt?.repeats ?? repeats : null;
+        const mediumLength = hasMedium ? altM?.length ?? length : null;
+        const slowLength = hasSlow ? alt?.length ?? length : null;
+
         const distanceText = getHtmlBlock(
-          `${getXText(repeats, alt?.repeats)}
-          ${getAltText(length, alt?.length)}L`,
+          `${getXText(repeats, mediumRepeats, slowRepeats)}
+          ${getAltText(length, mediumLength, slowLength)}L`,
           "b"
         );
         const restText = getHtmlBlock(
           `${
-            rest === "interval"
+            rest === "interval" && (restSeconds == null || restSeconds === 0)
               ? getIntervalText(
-                  alt as SingleDistanceWorkout,
                   length,
-                  intervalOffset
+                  intervalOffset,
+                  laneSpeed,
+                  hasMedium,
+                  hasSlow,
+                  alt as SingleDistanceWorkout
                 )
               : ""
           }
-          ${rest === "seconds" ? `${restSeconds}s rest` : ""}
+          ${
+            rest === "seconds" || (restSeconds != null && restSeconds > 0)
+              ? `${restSeconds}s rest`
+              : ""
+          }
           ${rest === "3rd_person" ? "3rd person in" : ""}`,
           "i"
         );
         return getHtmlBlock(`${distanceText} ${description} ${restText}`, "li");
       } else {
-        const { duration, alt } = workout as SingleTimedWorkout;
+        const { duration, alt, altM } = workout as SingleTimedWorkout;
         if (duration === 0) {
           return [];
         }
+        const mediumDuration = hasMedium ? altM?.duration ?? duration : null;
+        const slowDuration = hasSlow ? alt?.duration ?? duration : null;
         const durationHtml = getHtmlBlock(
-          getAltText(duration, alt?.duration),
+          getAltText(duration, mediumDuration, slowDuration),
           "b"
         );
         return getHtmlBlock(`${durationHtml} min ${description}`, "li");
       }
     });
     const laps = getTotalLapsPerGroup(workoutList) * rounds;
-    const lapsAlt =
-      getTotalLapsPerGroup(workoutList, true) * (roundsAlt ?? rounds);
+    const lapsAltM = hasMedium
+      ? getTotalLapsPerGroup(workoutList, "medium") * (roundsAltM ?? rounds)
+      : null;
+    const lapsAlt = hasSlow
+      ? getTotalLapsPerGroup(workoutList, "slow") * (roundsAlt ?? rounds)
+      : null;
 
     return `${setTitle}
     ${getHtmlBlock(workoutListText.join(""), "ul")}
     ${getHtmlBlock(
-      `${getHtmlBlock(getAltText(laps, lapsAlt), "b")} laps`,
+      `${getHtmlBlock(getAltText(laps, lapsAltM, lapsAlt), "b")} laps`,
       "p",
       true
     )}`;
   });
 
+  const totalLaps = practice.reduce((acc, group) => {
+    acc += getTotalLapsPerGroup(group.workoutList) * group.rounds;
+    return acc;
+  }, 0);
+
+  const totalLapsAltM = hasMedium
+    ? practice.reduce((acc, group) => {
+        acc +=
+          getTotalLapsPerGroup(group.workoutList, "medium") *
+          (group.roundsAltM ?? group.rounds);
+        return acc;
+      }, 0)
+    : null;
+
+  const totalLapsAlt = hasSlow
+    ? practice.reduce((acc, group) => {
+        acc +=
+          getTotalLapsPerGroup(group.workoutList, "slow") *
+          (group.roundsAlt ?? group.rounds);
+        return acc;
+      }, 0)
+    : null;
+
   const totalLapsText = `Total 
-  ${getHtmlBlock(getAltText(totalLaps, totalLapsAlt), "b")} 
+  ${getHtmlBlock(getAltText(totalLaps, totalLapsAltM, totalLapsAlt), "b")} 
   laps / ${getAltText(
-    getDistanceFromLaps(totalLaps),
+    getDistanceFromLaps(totalLaps) as string,
+    getDistanceFromLaps(totalLapsAltM),
     getDistanceFromLaps(totalLapsAlt)
   )}`;
 
-  return `${practiceText.join("<p/>")}<p/>
+  return `${
+    laneSpeed === "all"
+      ? getHtmlBlock(getAllLaneNames(hasMedium, hasSlow), "h1")
+      : ""
+  }<p/>${practiceText.join("<p/>")}<p/>
   ${getHtmlBlock(totalLapsText, "p", true)}`;
-}
-
-export function getLaneNames(type: "slow" | "major" = "slow"): string {
-  return LANE_NAMES.filter((name, i) =>
-    type === "slow" ? INTERVAL_BASE[i] >= 120 : INTERVAL_BASE[i] < 120
-  ).join(", ");
 }
 
 export function getGroupedHtmlString(
   practice: SingleWorkoutSet[],
-  totalLaps: number,
-  totalLapsAlt: number
+  hasMedium = true,
+  hasSlow = true
 ): string {
-  const majorPractice = practice.map((workout) => {
+  const fastLanePractice = practice.map((workout) => {
     const { name, rounds, workoutList } = workout;
     return {
       name,
       rounds,
-      roundsAlt: rounds,
       workoutList: workoutList.map((workout) => {
-        return { ...workout };
+        return { ...workout, alt: null, altM: null };
       }) as WorkoutList,
     };
   });
-  const slowLanePractice = practice.map((workout) => {
-    const { name, roundsAlt, rounds, workoutList } = workout;
-    return {
-      name,
-      rounds: roundsAlt ?? rounds,
-      roundsAlt: roundsAlt ?? rounds,
-      workoutList: workoutList.map((workout) => {
-        if (workout.alt != null) {
-          return { ...workout.alt };
-        } else {
-          return { ...workout };
-        }
-      }) as WorkoutList,
-    };
-  });
+  const mediumLanePractice = hasMedium
+    ? practice.map((workout) => {
+        const { name, roundsAltM, rounds, workoutList } = workout;
+        return {
+          name,
+          rounds: roundsAltM ?? rounds,
+          workoutList: workoutList.map((workout) => {
+            if (workout.altM != null) {
+              return { ...workout.altM, altM: null, alt: null };
+            } else {
+              return { ...workout };
+            }
+          }) as WorkoutList,
+        };
+      })
+    : null;
+  const slowLanePractice = hasSlow
+    ? practice.map((workout) => {
+        const { name, roundsAlt, rounds, workoutList } = workout;
+        return {
+          name,
+          rounds: roundsAlt ?? rounds,
+          workoutList: workoutList.map((workout) => {
+            if (workout.alt != null) {
+              return { ...workout.alt, altM: null };
+            } else {
+              return { ...workout };
+            }
+          }) as WorkoutList,
+        };
+      })
+    : null;
 
-  const majorLanes = getCombinedHtmlString(majorPractice, totalLaps, totalLaps);
-  const slowLanes = getCombinedHtmlString(
-    slowLanePractice,
-    totalLapsAlt,
-    totalLapsAlt
-  );
+  const fastLanes = getCombinedHtmlString(fastLanePractice, "fast");
+  const mediumLanes =
+    mediumLanePractice != null
+      ? getCombinedHtmlString(mediumLanePractice, "medium")
+      : null;
+  const slowLanes =
+    slowLanePractice != null
+      ? getCombinedHtmlString(slowLanePractice, "slow")
+      : null;
 
-  return `${getHtmlBlock(getLaneNames("major"), "h1")}<p/>${majorLanes}
-  <p/>
-  ${getHtmlBlock(getLaneNames(), "h1")}<p/>${slowLanes}`;
+  return `${getHtmlBlock(
+    getLaneNames("fast", hasMedium, hasSlow),
+    "h1"
+  )}${fastLanes}
+  <p/>${
+    mediumLanes != null
+      ? `${getHtmlBlock(
+          getLaneNames("medium", hasMedium, true),
+          "h1"
+        )}${mediumLanes}`
+      : ""
+  }<p/>
+  ${
+    slowLanes != null
+      ? `${getHtmlBlock(getLaneNames("slow", true, hasSlow), "h1")}${slowLanes}`
+      : ""
+  }`;
 }

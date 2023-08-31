@@ -4,7 +4,7 @@ import NumberInputControl from "./ChakraNumberInput";
 import { usePracticeDispatch } from "../utils/PracticeContext";
 
 interface Props {
-  type: "update" | "update-alt";
+  type: "update" | "update-alt" | "update-altM";
   setIndex: number;
   workoutIndex: number;
   repeats?: number;

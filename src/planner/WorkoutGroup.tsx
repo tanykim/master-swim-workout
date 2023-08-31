@@ -24,6 +24,7 @@ import WorkoutSetInput from "../inputs/WorkoutSetInput";
 interface Props extends SingleWorkoutSet {
   setIndex: number;
   isAlt?: boolean;
+  isAltM?: boolean;
 }
 
 const DISTANCE_WORKOUT = {
@@ -43,10 +44,13 @@ export default function WorkoutGroup({
   rounds,
   workoutList,
   isAlt = false,
+  isAltM = false,
 }: Props) {
   const dispatch = usePracticeDispatch();
 
   const totalLaps = getTotalLapsPerGroup(workoutList) * rounds;
+
+  const isMajor = !(isAlt || isAltM);
 
   return (
     <Box mb={6} borderBottom="1px" borderColor="gray.200" pb={6}>
@@ -56,8 +60,9 @@ export default function WorkoutGroup({
           name={name}
           rounds={rounds}
           isAlt={isAlt}
+          isAltM={isAltM}
         />
-        {!isAlt && (
+        {isMajor && (
           <HStack flexGrow={1} justify="flex-end" wrap="wrap">
             <Tooltip
               label={`Remove this ${
@@ -73,7 +78,11 @@ export default function WorkoutGroup({
                 onClick={() =>
                   dispatch({
                     level: "set",
-                    type: isAlt ? "remove-alt" : "remove",
+                    type: isAlt
+                      ? "remove-alt"
+                      : isAltM
+                      ? "remove-altM"
+                      : "remove",
                     setIndex: setIndex,
                   })
                 }
@@ -96,6 +105,7 @@ export default function WorkoutGroup({
               setIndex={setIndex}
               workoutIndex={i}
               isAlt={isAlt}
+              isAltM={isAltM}
               {...(workout as SingleDistanceWorkout)}
             />
           ) : (
@@ -103,21 +113,21 @@ export default function WorkoutGroup({
               setIndex={setIndex}
               workoutIndex={i}
               isAlt={isAlt}
+              isAltM={isAltM}
               {...(workout as SingleTimedWorkout)}
             />
           )}
-          {!isAlt && (
+          {isMajor && (
             <ControlWorkout
               setIndex={setIndex}
               workoutIndex={i}
               isLast={i === workoutList.length - 1}
-              isAlt={isAlt}
             />
           )}
         </Flex>
       ))}
-      <Flex align="center" justify={isAlt ? "flex-end" : "space-between"}>
-        {!isAlt && (
+      <Flex align="center" justify={isMajor ? "space-between" : "flex-end"}>
+        {isMajor && (
           <HStack gap={2} wrap="wrap">
             <Button
               size="sm"

@@ -8,12 +8,14 @@ interface Props {
   name: string;
   rounds: number;
   isAlt?: boolean;
+  isAltM?: boolean;
 }
 export default function WorkoutSetInput({
   setIndex,
   name,
   rounds,
   isAlt = false,
+  isAltM = false,
 }: Props) {
   const dispatch = usePracticeDispatch();
 
@@ -33,7 +35,7 @@ export default function WorkoutSetInput({
         }
         width={UNIT_W * 10}
         autoFocus
-        disabled={isAlt}
+        disabled={isAlt || isAltM}
       />
       <Text fontSize="sm" fontWeight={700}>
         X
@@ -41,7 +43,7 @@ export default function WorkoutSetInput({
       <NumberInputControl
         width={UNIT_W}
         max={10}
-        min={isAlt ? 0 : 1}
+        min={isAlt || isAltM ? 0 : 1}
         value={rounds}
         variant="filled"
         onChange={(value) =>
@@ -50,7 +52,7 @@ export default function WorkoutSetInput({
             type: "update",
             setIndex: setIndex,
             updates: {
-              key: isAlt ? "roundsAlt" : "rounds",
+              key: isAlt ? "roundsAlt" : isAltM ? "roundsAltM" : "rounds",
               value: parseInt(value),
             },
           })

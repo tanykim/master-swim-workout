@@ -2,7 +2,7 @@ import { Input } from "@chakra-ui/react";
 import { usePracticeDispatch } from "../utils/PracticeContext";
 
 interface Props {
-  type: "update" | "update-alt";
+  type: "update" | "update-alt" | "update-altM";
   setIndex: number;
   workoutIndex: number;
   description?: string;

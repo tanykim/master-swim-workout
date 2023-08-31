@@ -24,7 +24,11 @@ export default function ElapsedTimeTable() {
       .map(
         (group) =>
           getTotalSecondsFromIntervalPerGroup(base, group.workoutList) *
-          (base < 120 ? group.rounds : group.roundsAlt ?? group.rounds)
+          (base >= 120
+            ? group.roundsAlt ?? group.rounds
+            : base > 90
+            ? group.roundsAltM ?? group.rounds
+            : group.rounds)
       )
       .reduce((acc, curr) => acc + curr, 0);
     const groupBreaks = (practice.length - 1) * GROUP_BREAK_SEC;
@@ -34,7 +38,7 @@ export default function ElapsedTimeTable() {
   return (
     <Box>
       <Heading size="h3" mb={4}>
-        Estimated elapsed time
+        ⏳ Estimated elapsed time
       </Heading>
       <TableContainer
         width="4xl"

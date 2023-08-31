@@ -18,13 +18,18 @@ interface Action {
   type:
     | "add-slow-lanes"
     | "remove-slow-lanes"
+    | "add-medium-lanes"
+    | "remove-medium-lanes"
     | "add"
     | "remove"
+    | "remove-alt"
+    | "remove-altM"
     | "update"
     | "move-up"
     | "move-down"
     | "update-alt"
-    | "remove-alt";
+    | "update-altM";
+
   setIndex?: number;
   workoutIndex?: number;
   updates?: { key: string; value: string | number };
@@ -33,7 +38,6 @@ interface Action {
 
 function practiceReducer(practice: SingleWorkoutSet[], action: Action) {
   const prevPractice = [...practice];
-
   if (action.level === "practice") {
     switch (action.type) {
       case "add-slow-lanes": {
@@ -52,6 +56,32 @@ function practiceReducer(practice: SingleWorkoutSet[], action: Action) {
         return prevPractice.map((workoutSet) => {
           const workoutList = workoutSet.workoutList.map((workout) => {
             return { ...workout, alt: null };
+          });
+          return {
+            name: workoutSet.name,
+            rounds: workoutSet.rounds,
+            workoutList,
+          } as SingleWorkoutSet;
+        });
+      }
+      case "add-medium-lanes": {
+        return prevPractice.map((workoutSet) => {
+          const workoutList = workoutSet.workoutList.map((workout) => {
+            return workout.altM != null
+              ? workout
+              : { ...workout, altM: workout };
+          });
+          return {
+            ...workoutSet,
+            roundsAltM: workoutSet.rounds,
+            workoutList,
+          } as SingleWorkoutSet;
+        });
+      }
+      case "remove-medium-lanes": {
+        return prevPractice.map((workoutSet) => {
+          const workoutList = workoutSet.workoutList.map((workout) => {
+            return { ...workout, altM: null };
           });
           return {
             name: workoutSet.name,
@@ -137,10 +167,23 @@ function practiceReducer(practice: SingleWorkoutSet[], action: Action) {
         if (action.updates == null) {
           return prevPractice;
         }
+        // @ts-ignore
         prevWorkoutList[workoutIndex] = {
           ...workout,
           [action.updates.key]: action.updates.value,
         };
+        if (workout.alt != null) {
+          prevWorkoutList[workoutIndex].alt = {
+            ...(workout.alt ?? workout),
+            [action.updates.key]: action.updates.value,
+          };
+        }
+        if (workout.altM != null) {
+          prevWorkoutList[workoutIndex].altM = {
+            ...(workout.altM ?? workout),
+            [action.updates.key]: action.updates.value,
+          };
+        }
         break;
       }
       case "update-alt": {
@@ -152,6 +195,20 @@ function practiceReducer(practice: SingleWorkoutSet[], action: Action) {
           ...workout,
           alt: {
             ...(workout.alt ?? workout),
+            [action.updates.key]: action.updates.value,
+          },
+        };
+        break;
+      }
+      case "update-altM": {
+        if (action.updates == null) {
+          return prevPractice;
+        }
+        // @ts-ignore
+        prevWorkoutList[workoutIndex] = {
+          ...workout,
+          altM: {
+            ...(workout.altM ?? workout),
             [action.updates.key]: action.updates.value,
           },
         };

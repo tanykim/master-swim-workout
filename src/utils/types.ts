@@ -11,11 +11,13 @@ export interface SingleDistanceWorkout extends SingleWorkout {
   intervalOffset?: number;
   restSeconds?: number;
   alt?: SingleDistanceWorkout | null;
+  altM?: SingleDistanceWorkout | null;
 }
 
 export interface SingleTimedWorkout extends SingleWorkout {
   duration: number;
   alt?: SingleTimedWorkout | null;
+  altM?: SingleTimedWorkout | null;
 }
 
 export type WorkoutList = (SingleDistanceWorkout | SingleTimedWorkout)[];
@@ -25,6 +27,7 @@ export interface SingleWorkoutSet {
   rounds: number;
   workoutList: WorkoutList;
   roundsAlt?: number | null;
+  roundsAltM?: number | null;
 }
 
 export type UpdateInput = (
@@ -37,4 +40,5 @@ export type WorkoutProps = {
   setIndex: number;
   workoutIndex: number;
   isAlt: boolean;
+  isAltM: boolean;
 };

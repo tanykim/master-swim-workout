@@ -11,7 +11,6 @@ import { editorConfig } from "./editorConfig";
 import {
   getCombinedHtmlString,
   getGroupedHtmlString,
-  getTotalLapsPerGroup,
 } from "../utils/converter";
 import {
   Box,
@@ -28,31 +27,34 @@ import "./editor.css";
 export type DisplayType = "separate" | "combined";
 
 const displayTypes: { value: DisplayType; label: string }[] = [
-  { value: "separate", label: "Show slow lanes separately" },
-  { value: "combined", label: "Show combined like (slow lanes)" },
+  { value: "separate", label: "Show lanes separately by speed" },
+  {
+    value: "combined",
+    label: "Show combined like (medium lanes / slow lanes)",
+  },
 ];
 
 export default function TextEditor() {
   const practice = usePractice();
-  const totalLaps = practice.reduce((acc, group) => {
-    acc += getTotalLapsPerGroup(group.workoutList) * group.rounds;
-    return acc;
-  }, 0);
 
-  const totalLapsAlt = practice.reduce((acc, group) => {
-    acc +=
-      getTotalLapsPerGroup(group.workoutList, true) *
-      (group.roundsAlt ?? group.rounds);
-    return acc;
-  }, 0);
+  const hasMedium =
+    practice.filter(
+      (group) =>
+        group.workoutList.filter((workout) => workout.altM != null).length > 0
+    ).length > 0;
+
+  const hasSlow =
+    practice.filter(
+      (group) =>
+        group.workoutList.filter((workout) => workout.alt != null).length > 0
+    ).length > 0;
 
   const [displayHtml, setDisplayHtml] = useState<DisplayType>("separate");
 
   const htmlString =
     displayHtml === "combined"
-      ? getCombinedHtmlString(practice, totalLaps, totalLapsAlt)
-      : // ? getHtmlString(practice, totalLaps, INTERVAL_BASE, "both", totalLapsAlt)
-        getGroupedHtmlString(practice, totalLaps, totalLapsAlt);
+      ? getCombinedHtmlString(practice, "all", hasMedium, hasSlow)
+      : getGroupedHtmlString(practice, hasMedium, hasSlow);
 
   return (
     <Box>
